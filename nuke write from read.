@@ -1,3 +1,8 @@
+# Select the write node/s
+#run the script
+'''It will fill the filename slot of the write with the values that the read nodes has and will add the user variable at the end
+  before the extension
+'''
 sn = nuke.selectedNodes()
 agregado = 'chota' # needs to be an input
 
