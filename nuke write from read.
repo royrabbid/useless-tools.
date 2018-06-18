@@ -4,7 +4,7 @@
   before the extension
 '''
 sn = nuke.selectedNodes()
-agregado = 'chota' # needs to be an input
+agregado = 'WHATEVER YOU WANT AT THE END' # adds this variable at the end before the extension.
 
 def upstream(startNode=None,nodes=None):
     if nodes is None:
