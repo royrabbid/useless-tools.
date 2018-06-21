@@ -21,7 +21,7 @@ def upstream(startNode=None,nodes=None):
                             upstream(o,nodes=nodes)
                 upstream(n,nodes=nodes)
         return list(nodes)
-
+# creates the colorspace and the write nodes
 for i in sr:
     nuke.selectAll()
     nuke.invertSelection()    
@@ -35,6 +35,7 @@ for i in sr:
     nuke.selectedNode().knob('metadata').setValue('no metadata')
     sn = nuke.selectedNodes()
     print sn
+    #Deals with the write nodes
     for wr in sn:
         nodeList = upstream(nuke.selectedNodes())
         for nds in nodeList:
