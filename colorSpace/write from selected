@@ -1,8 +1,7 @@
 sr = nuke.selectedNodes()
 
-sufix = 'linear' # needs to be an input
+sufix = 'RE' 
 format = 'exr'
-output = '/asset/assetLibrary/character/beeA/components/hero/texture/lod100/v001/user/rodrigog/source/abdomen/linear/'
 
 def upstream(startNode=None,nodes=None):
         if nodes is None:
@@ -22,6 +21,7 @@ def upstream(startNode=None,nodes=None):
                             upstream(o,nodes=nodes)
                 upstream(n,nodes=nodes)
         return list(nodes)
+
 for i in sr:
     nuke.selectAll()
     nuke.invertSelection()    
@@ -29,6 +29,10 @@ for i in sr:
     nuke.createNode("Colorspace",inpanel=False )
     nuke.selectedNode().knob('colorspace_in').setValue('sRGB')
     nuke.createNode("Write",inpanel=False )
+    nuke.selectedNode().knob('channels').setValue('rgb')
+    nuke.selectedNode().knob('file_type').setValue('exr')
+    nuke.selectedNode().knob('autocrop').setValue('1')
+    nuke.selectedNode().knob('metadata').setValue('no metadata')
     sn = nuke.selectedNodes()
     print sn
     for wr in sn:
