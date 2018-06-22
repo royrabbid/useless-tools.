@@ -28,6 +28,7 @@ for i in sr:
     i.setSelected(True)
     nuke.createNode("Colorspace",inpanel=False )
     nuke.selectedNode().knob('colorspace_in').setValue('sRGB')
+    nuke.createNode("Crop",inpanel=False )
     nuke.createNode("Write",inpanel=False )
     nuke.selectedNode().knob('channels').setValue('rgb')
     nuke.selectedNode().knob('file_type').setValue('exr')
