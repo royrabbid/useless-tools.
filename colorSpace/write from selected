@@ -1,8 +1,7 @@
+# Creates a colorspace, a crop and a Wrtite node. Fills in the write with the data of the read.
 sr = nuke.selectedNodes()
-
 sufix = 'RE' 
 format = 'exr'
-
 def upstream(startNode=None,nodes=None):
         if nodes is None:
             nodes = set([])
