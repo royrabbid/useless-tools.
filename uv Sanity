@@ -1,0 +1,54 @@
+import maya.cmds as cmds
+import math
+import pymel.core as pm
+import maya.mel as mel
+objSel = cmds.ls(sl=True)
+badUv = []
+dicc = {}
+print objSel
+for o in objSel:
+    cmds.select(o)
+    shellsNum = pm.polyEvaluate(us=True)
+    sids = []
+    for sid in range(0,shellsNum):
+        selectUVShell = cmds.select (pm.polyEvaluate(uis=sid))
+        bBox = cmds.polyEvaluate(bc2=True)
+        xMin = bBox[0][0]
+        xMax = bBox[0][1]
+        yMin = bBox[1][0]
+        yMax = bBox[1][1]
+        xAvr = (xMin + xMax) /2
+        yAvr = (yMin + yMax) /2
+        minRangex = math.floor(xAvr)
+        maxRangex = math.ceil(xAvr) 
+        minRangey = math.floor(yAvr)
+        maxRangey = math.ceil(yAvr)
+        
+       
+        if xMin < minRangex or xMax > maxRangex or yMin < minRangey or yMax > maxRangey :
+            badUv.append(sid)
+            sids.append(sid)
+            dicc[o]=sids
+            print "UVs out side it's tile in shell %d" % sid, objSel 
+            print o,', shellId: ',sid,':','xMin is:', xMin, ',min Range is:', minRangex
+            print '                     ','xMax is:', xMax, ',max Range is:', maxRangex
+            print '                     ','yMin is:', yMin, ',min Range is:', minRangey
+            print '                     ','yMax is:', yMax,  ',max Range is:', maxRangey
+            print '                     ','xAverage is:', xAvr
+            print '                     ','yAverage is:', yAvr
+            print '-'*200
+            
+        else:
+            print 'All good man'
+   
+print 'number of shells:', shellsNum
+print 'number of bad uvShells', len(badUv)
+cmds.select(d=True)
+for key, value in dicc.items():         
+        cmds.select (key, af=True)
+        for bShels in value:
+           cmds.select(pm.polyEvaluate(uis=bShels),add=True)
+for transf in objSel:
+    cmds.select(transf, d=True)
+    
+cmds.select(cmds.polyListComponentConversion(tf = True))
