@@ -5,10 +5,12 @@ import maya.mel as mel
 objSel = cmds.ls(sl=True)
 badUv = []
 dicc = {}
+shellAmount = 0 
 print objSel
 for o in objSel:
     cmds.select(o)
-    shellsNum = pm.polyEvaluate(us=True)
+    shellsNum = pm.polyEvaluate(us=True) 
+    shellAmount = shellAmount + shellsNum
     sids = []
     for sid in range(0,shellsNum):
         selectUVShell = cmds.select (pm.polyEvaluate(uis=sid))
@@ -25,7 +27,7 @@ for o in objSel:
         maxRangey = math.ceil(yAvr)
         
        
-        if xMin < minRangex or xMax > maxRangex or yMin < minRangey or yMax > maxRangey :
+        if xMin < minRangex or xMax > maxRangex or yMin < minRangey or yMax > maxRangey or xMin < 0 or xMax > 10 or yMin < 0:
             badUv.append(sid)
             sids.append(sid)
             dicc[o]=sids
@@ -41,7 +43,7 @@ for o in objSel:
         else:
             print 'All good man'
    
-print 'number of shells:', shellsNum
+print 'number of shells:', shellAmount
 print 'number of bad uvShells', len(badUv)
 cmds.select(d=True)
 for key, value in dicc.items():         
