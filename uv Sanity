@@ -39,10 +39,7 @@ for o in objSel:
             print '                     ','xAverage is:', xAvr
             print '                     ','yAverage is:', yAvr
             print '-'*200
-            
-        else:
-            print 'All good man'
-   
+              
 print 'number of shells:', shellAmount
 print 'number of bad uvShells', len(badUv)
 cmds.select(d=True)
