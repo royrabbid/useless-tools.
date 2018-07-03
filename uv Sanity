@@ -7,7 +7,7 @@ noUV = []
 badUv = []
 dicc = {}
 shellAmount = 0 
-print objSel
+
 for o in objSel:
     cmds.select(o)
     nouv = cmds.polyEvaluate(uvcoord=True)
@@ -43,9 +43,13 @@ for o in objSel:
             print '                     ','xAverage is:', xAvr
             print '                     ','yAverage is:', yAvr
             print '-'*200
-            cmds.warning ("There are UVs outside its UV Tile, see the script editor")
+
+print 'Results'            
+print '-'*200            
 print 'number of shells:', shellAmount
-print 'number of bad uvShells', len(badUv)
+
+print 'number of uvShells outside its UV tile', len(badUv)
+
 print 'geo with no UVs', noUV
 cmds.select(d=True)
 for key, value in dicc.items():         
@@ -57,7 +61,7 @@ for transf in objSel:
 for noUV in noUV:
     cmds.select(noUV, add=True)
 cmds.select(cmds.polyListComponentConversion(tf = True))
-
+print '-'*200
 if len(noUV) > 0:
    cmds.warning ("There are GEOS with no UVs, see the script editor") 
 if len(badUv) > 0:
