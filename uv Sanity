@@ -11,10 +11,8 @@ print objSel
 for o in objSel:
     cmds.select(o)
     nouv = cmds.polyEvaluate(uvcoord=True)
-    print nouv
     if nouv == 0:
-        noUV.append(o)
-        
+        noUV.append(o) 
         
     shellsNum = pm.polyEvaluate(us=True) 
     shellAmount = shellAmount + shellsNum
@@ -33,7 +31,6 @@ for o in objSel:
         minRangey = math.floor(yAvr)
         maxRangey = math.ceil(yAvr)
         
-       
         if xMin < minRangex or xMax > maxRangex or yMin < minRangey or yMax > maxRangey or xMin < 0 or xMax > 10 or yMin < 0:
             badUv.append(sid)
             sids.append(sid)
@@ -46,7 +43,7 @@ for o in objSel:
             print '                     ','xAverage is:', xAvr
             print '                     ','yAverage is:', yAvr
             print '-'*200
-   
+            cmds.warning ("There are UVs outside its UV Tile, see the script editor")
 print 'number of shells:', shellAmount
 print 'number of bad uvShells', len(badUv)
 print 'geo with no UVs', noUV
@@ -58,6 +55,12 @@ for key, value in dicc.items():
 for transf in objSel:
     cmds.select(transf, d=True)
 for noUV in noUV:
-    cmds.select(noUV, add=True)   
+    cmds.select(noUV, add=True)
 cmds.select(cmds.polyListComponentConversion(tf = True))
 
+if len(noUV) > 0:
+   cmds.warning ("There are GEOS with no UVs, see the script editor") 
+if len(badUv) > 0:
+    cmds.warning ("There are UVs outside it uvTile, see the script editor") 
+if len(badUv) > 0 and  len(badUv) > 0:
+    cmds.warning ("There are UVs outside it uvTile and some GEO doesn't have any UVs, see the script editor")
