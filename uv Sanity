@@ -3,12 +3,19 @@ import math
 import pymel.core as pm
 import maya.mel as mel
 objSel = cmds.ls(sl=True)
+noUV = []
 badUv = []
 dicc = {}
 shellAmount = 0 
 print objSel
 for o in objSel:
     cmds.select(o)
+    nouv = cmds.polyEvaluate(uvcoord=True)
+    print nouv
+    if nouv == 0:
+        noUV.append(o)
+        
+        
     shellsNum = pm.polyEvaluate(us=True) 
     shellAmount = shellAmount + shellsNum
     sids = []
@@ -39,9 +46,13 @@ for o in objSel:
             print '                     ','xAverage is:', xAvr
             print '                     ','yAverage is:', yAvr
             print '-'*200
-              
+            
+        else:
+            print 'All good man'
+   
 print 'number of shells:', shellAmount
 print 'number of bad uvShells', len(badUv)
+print 'geo with no UVs', noUV
 cmds.select(d=True)
 for key, value in dicc.items():         
         cmds.select (key, af=True)
@@ -49,5 +60,7 @@ for key, value in dicc.items():
            cmds.select(pm.polyEvaluate(uis=bShels),add=True)
 for transf in objSel:
     cmds.select(transf, d=True)
-    
+for noUV in noUV:
+    cmds.select(noUV, add=True)   
 cmds.select(cmds.polyListComponentConversion(tf = True))
+
