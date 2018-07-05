@@ -1,0 +1,80 @@
+sr = nuke.selectedNodes()
+
+sufix = 'DAV' 
+format = 'exr'
+fileMode =  '1'   # if set to 0 read node will be used for naming if set to 1 newPath and newFile file will be used.
+newFile =  'nuevo_nombre'    # tiene que estar entre comillas
+newPath =   'nuevo/path/'   # tiene que estar entre comillas
+def upstream(startNode=None,nodes=None):
+        if nodes is None:
+            nodes = set([])
+        node = startNode
+        if not node:
+            return
+        else:
+            upNodes = nuke.dependencies(node)
+            for n in upNodes:
+                nodes.add(n)
+                if n.Class() == "Group":
+                    group = nuke.toNode(n.name())
+                    with group:
+                        outputs = nuke.allNodes('Output')
+                        for o in outputs:
+                            upstream(o,nodes=nodes)
+                upstream(n,nodes=nodes)
+        return list(nodes)
+# creates the colorspace and the write nodes
+for i in sr:
+    nuke.selectAll()
+    nuke.invertSelection()    
+    i.setSelected(True)
+    #nuke.createNode("Colorspace",inpanel=False )
+    #nuke.selectedNode().knob('colorspace_in').setValue('sRGB')
+    nuke.createNode("OCIOColorSpace",inpanel=False )
+    nuke.selectedNode().knob('in_colorspace').setValue('format_sRGB')
+    nuke.createNode("Crop",inpanel=False )
+    nuke.createNode("Write",inpanel=False )
+    nuke.selectedNode().knob('channels').setValue('rgb')
+    nuke.selectedNode().knob('file_type').setValue('exr')
+    nuke.selectedNode().knob('autocrop').setValue('1')
+    nuke.selectedNode().knob('metadata').setValue('no metadata')
+    sn = nuke.selectedNodes()
+
+    print sn
+    #Deals with the write nodes
+    for wr in sn:
+        nodeList = upstream(nuke.selectedNodes())
+        for nds in nodeList:
+            global var
+            readlist = []
+            if nds.Class() == "Read":
+                print 'es Read'
+                readlist.append(nds)
+                for read in readlist:
+                    print read['file'].getValue()
+                    read.setSelected(True)
+                    path =  [read.knobs()['file'].value()] # prints file attr from the selected node
+                    print path
+                    for repl in path:
+                        if fileMode == ('1'):
+                            jpth = repl.split('/') # separates the data by dots present in them.
+                            print jpth
+                            file = jpth.pop(-1)
+                            print file
+                            jpth = repl.split('/') # separates the data by dots present in them.
+                            print jpth
+                            mrg ='/'.join(pth)
+                            print mrg
+                            fle = pth.pop(-1)
+                            print fle 
+                            jPth = mrg-fle
+                            print jPth
+                        else:
+                            sp = repl.split('.') # separates the data by dots present in them.
+                            print sp
+                            form = sp.pop(-1)
+                            jn='.'.join(sp) # merges everything
+                            finalPath = jn+'_'+sufix+'.'+format   
+                            print finalPath
+                            print wr
+                            wr['file'].setValue(finalPath)
