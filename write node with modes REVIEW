@@ -1,10 +1,9 @@
 sr = nuke.selectedNodes()
-import nuke
 sufix = 'SUFIX' 
 format = 'exr'
 fileMode =  '2'   #1 absoluto solo el path same name/2 absoluto el name same path/3 taken from read
-newFile =  'NEWFILE'    # tiene que estar entre comillas
-newPath =   'D:/pictures/3d/guerrero_predator/muestras/test/'   # tiene que estar entre comillas
+newFile =  'NEWFILE'   
+newPath =   'D:/XXXXX/XXX/XXXXX/XXXXXX/XXXXX/'  
 def upstream(startNode=None,nodes=None):
         if nodes is None:
             nodes = set([])
