@@ -1,14 +1,10 @@
-import nuke
 sr = nuke.selectedNodes()
-sufix = 'FRA' 
+import nuke
+sufix = 'SUFIX' 
 format = 'exr'
-
-fileMode =  '3'   #1 path variable same name/2 name variable same path/3 taken from read and added a prefix
-
-newFile =  'franArchivo'    # tiene que estar entre comillas
-
+fileMode =  '2'   #1 absoluto solo el path same name/2 absoluto el name same path/3 taken from read
+newFile =  'NEWFILE'    # tiene que estar entre comillas
 newPath =   'D:/pictures/3d/guerrero_predator/muestras/test/'   # tiene que estar entre comillas
-
 def upstream(startNode=None,nodes=None):
         if nodes is None:
             nodes = set([])
@@ -60,7 +56,7 @@ for i in sr:
                     for repl in path:
                         if fileMode == ('1'):
                             spa = repl.split('.') # separates the data by dots present in them.
-                            forma = spa.pop(-1) 
+                            forma = spa.pop(-1)
                             jptha = repl.split('/') # separates the data by dots present in them.
                             filea = jptha.pop(-1)
                             fSplit = filea.split('.')
@@ -74,8 +70,7 @@ for i in sr:
 
                         if fileMode == ('2'):
                             spb = repl.split('.') # separates the data by dots present in them.
-                            
-                            form = spb.pop(-1)
+                            forma = spb.pop(-1)
                             jpthb = repl.split('/') # separates the data by dots present in them.
                             fileb = jpthb.pop(-1)
                             jpthb = repl.split('/') # separates the data by dots present in them.
@@ -91,4 +86,5 @@ for i in sr:
                             form = sp.pop(-1)
                             jn='.'.join(sp) # merges everything
                             finalPath = jn+'_'+sufix+'.'+format   
+                            print finalPath
                             wr['file'].setValue(finalPath)
