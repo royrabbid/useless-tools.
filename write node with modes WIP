@@ -1,10 +1,14 @@
+import nuke
 sr = nuke.selectedNodes()
-
-sufix = 'DAV' 
+sufix = 'FRA' 
 format = 'exr'
-fileMode =  '1'   # if set to 0 read node will be used for naming if set to 1 newPath and newFile file will be used.
-newFile =  'nuevo_nombre'    # tiene que estar entre comillas
-newPath =   'nuevo/path/'   # tiene que estar entre comillas
+
+fileMode =  '3'   #1 path variable same name/2 name variable same path/3 taken from read and added a prefix
+
+newFile =  'franArchivo'    # tiene que estar entre comillas
+
+newPath =   'D:/pictures/3d/guerrero_predator/muestras/test/'   # tiene que estar entre comillas
+
 def upstream(startNode=None,nodes=None):
         if nodes is None:
             nodes = set([])
@@ -28,10 +32,8 @@ for i in sr:
     nuke.selectAll()
     nuke.invertSelection()    
     i.setSelected(True)
-    #nuke.createNode("Colorspace",inpanel=False )
-    #nuke.selectedNode().knob('colorspace_in').setValue('sRGB')
-    nuke.createNode("OCIOColorSpace",inpanel=False )
-    nuke.selectedNode().knob('in_colorspace').setValue('format_sRGB')
+    nuke.createNode("Colorspace",inpanel=False )
+    nuke.selectedNode().knob('colorspace_in').setValue('sRGB')
     nuke.createNode("Crop",inpanel=False )
     nuke.createNode("Write",inpanel=False )
     nuke.selectedNode().knob('channels').setValue('rgb')
@@ -57,24 +59,36 @@ for i in sr:
                     print path
                     for repl in path:
                         if fileMode == ('1'):
-                            jpth = repl.split('/') # separates the data by dots present in them.
-                            print jpth
-                            file = jpth.pop(-1)
-                            print file
-                            jpth = repl.split('/') # separates the data by dots present in them.
-                            print jpth
-                            mrg ='/'.join(pth)
-                            print mrg
-                            fle = pth.pop(-1)
-                            print fle 
-                            jPth = mrg-fle
-                            print jPth
-                        else:
+                            spa = repl.split('.') # separates the data by dots present in them.
+                            forma = spa.pop(-1) 
+                            jptha = repl.split('/') # separates the data by dots present in them.
+                            filea = jptha.pop(-1)
+                            fSplit = filea.split('.')
+                            jFilea = fSplit[:-1]
+                            jptha = repl.split('/') # separates the data by dots present in them.
+                            onlyPatha = jptha[:-1]
+                            mrga ='/'.join(onlyPatha)
+                            JustPatha = mrga + ('/')
+                            filePa = newPath + str(jFilea) +'.'+format % jFilea
+                            wr['file'].setValue(filePa)
+
+                        if fileMode == ('2'):
+                            spb = repl.split('.') # separates the data by dots present in them.
+                            
+                            form = spb.pop(-1)
+                            jpthb = repl.split('/') # separates the data by dots present in them.
+                            fileb = jpthb.pop(-1)
+                            jpthb = repl.split('/') # separates the data by dots present in them.
+                            onlyPathb = jpthb[:-1]
+                            mrgb ='/'.join(onlyPathb)
+                            JustPathb = mrgb + ('/')
+                            filePb = JustPathb + newFile +'.'+format
+                            wr['file'].setValue(filePb)
+    
+                        if fileMode == ('3'):
                             sp = repl.split('.') # separates the data by dots present in them.
                             print sp
                             form = sp.pop(-1)
                             jn='.'.join(sp) # merges everything
                             finalPath = jn+'_'+sufix+'.'+format   
-                            print finalPath
-                            print wr
                             wr['file'].setValue(finalPath)
