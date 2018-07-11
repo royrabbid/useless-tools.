@@ -18,13 +18,15 @@ class SetWrite(nukescripts.PythonPanel):
                 #Adds Knobs         
                 for k in ( self.modeKnob,self.textExpl, self.formKnob, self.pathKnob, self.fileKnob, self.prefixKnob):
                         self.addKnob(k)
-SetWrite(nuke.selectedNode()).showModalDialog()
+                 
+                
+SetWrite(()).showModalDialog()
 
 
 sr = nuke.selectedNodes()
-sufix = 'SUFIX' 
+sufix = [] 
 format = 'exr'
-fileMode =  modeKnob   #1 absoluto solo el path same name/2 absoluto el name same path/3 taken from read/4both
+fileMode =    #1 absoluto solo el path same name/2 absoluto el name same path/3 taken from read/4both
 newFile =  'NEWFILE'   
 newPath =   'D:/XXXXX/XXX/XXXXX/XXXXXX/XXXXX/'  
 
