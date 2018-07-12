@@ -32,11 +32,8 @@ for i in sr:
     nuke.createNode("Crop",inpanel=False )
     nuke.createNode("Write",inpanel=False )
     nuke.selectedNode().knob('channels').setValue('rgb')
-    nuke.selectedNode().knob('file_type').setValue('exr')
-    nuke.selectedNode().knob('autocrop').setValue('1')
-    nuke.selectedNode().knob('metadata').setValue('no metadata')
+    nuke.selectedNode().knob('file_type').setValue(format)
     sn = nuke.selectedNodes()
-
     print sn
     #Deals with the write nodes
     for wr in sn:
