@@ -1,0 +1,103 @@
+sr = nuke.selectedNodes()
+sufix = 'SUFIX' 
+fileMode =  '3'   #1 absoluto solo el path same name/2 absoluto el name same path/3 taken from read
+format = 'jpg'
+newFile =  'NEWFILE'   
+newPath =   'D:/XXXXX/XXX/XXXXX/XXXXXX/XXXXX/'  
+
+def upstream(startNode=None,nodes=None):
+        if nodes is None:
+            nodes = set([])
+        node = startNode
+        if not node:
+            return
+        else:
+            upNodes = nuke.dependencies(node)
+            for n in upNodes:
+                nodes.add(n)
+                if n.Class() == "Group":
+                    group = nuke.toNode(n.name())
+                    with group:
+                        outputs = nuke.allNodes('Output')
+                        for o in outputs:
+                            upstream(o,nodes=nodes)
+                upstream(n,nodes=nodes)
+        return list(nodes)
+# creates the colorspace and the write nodes
+for i in sr:
+    nuke.selectAll()
+    nuke.invertSelection()    
+    i.setSelected(True)
+    nuke.createNode("Colorspace",inpanel=False )
+    nuke.selectedNode().knob('colorspace_in').setValue('sRGB')
+    nuke.createNode("Crop",inpanel=False )
+    nuke.createNode("Write",inpanel=False )
+    if format == ('exr'):
+        nuke.selectedNode().knob('channels').setValue('rgb')
+        nuke.selectedNode().knob('file_type').setValue('exr')
+        nuke.selectedNode().knob('autocrop').setValue('1')
+        nuke.selectedNode().knob('metadata').setValue('no metadata')
+    if format == ('jpg'):
+        nuke.selectedNode().knob('channels').setValue('rgb')
+        nuke.selectedNode().knob('file_type').setValue('jpeg')
+        nuke.selectedNode().knob('_jpeg_quality').setValue('1')
+    if format == ('tga'):
+        nuke.selectedNode().knob('channels').setValue('rgb')
+        nuke.selectedNode().knob('file_type').setValue('jpeg')
+        nuke.selectedNode().knob('_jpeg_quality').setValue('1')
+    sn = nuke.selectedNodes()
+
+    print sn
+    #Deals with the write nodes
+    for wr in sn:
+        nodeList = upstream(nuke.selectedNodes())
+        for nds in nodeList:
+            global var
+            readlist = []
+            if nds.Class() == "Read":
+                print 'es Read'
+                readlist.append(nds)
+                for read in readlist:
+                    print read['file'].getValue()
+                    read.setSelected(True)
+                    path =  [read.knobs()['file'].value()] # prints file attr from the selected node
+                    print path
+                    for repl in path:
+                        if fileMode == ('1'):
+                            spa = repl.split('.') # separates the data by dots present in them.
+                            forma = spa.pop(-1)
+                            jptha = repl.split('/') # separates the data by dots present in them.
+                            filea = jptha.pop(-1)
+                            fSplit = filea.split('.')
+                            jFilea = fSplit[-2]
+                            jptha = repl.split('/') # separates the data by dots present in them.
+                            onlyPatha = jptha[-2]
+                            mrga ='/'.join(onlyPatha)
+                            JustPatha = mrga + ('/')
+                            filePa = newPath + jFilea +'.'+format 
+                            wr['file'].setValue(filePa)
+
+                        if fileMode == ('2'):
+                            spb = repl.split('.') # separates the data by dots present in them.
+                            forma = spb.pop(-1)
+                            jpthb = repl.split('/') # separates the data by dots present in them.
+                            fileb = jpthb.pop(-1)
+                            jpthb = repl.split('/') # separates the data by dots present in them.
+                            onlyPathb = jpthb[:-1]
+                            mrgb ='/'.join(onlyPathb)
+                            JustPathb = mrgb + ('/')
+                            filePb = JustPathb + newFile +'.'+format
+                            wr['file'].setValue(filePb)
+    
+                        if fileMode == ('3'):
+                            sp = repl.split('.') # separates the data by dots present in them.
+                            form = sp.pop(-1)
+                            jn='.'.join(sp) # merges everything
+                            finalPath = jn+'_'+sufix+'.'+format   
+                            print finalPath
+                            wr['file'].setValue(finalPath)
+
+
+                        if fileMode == ('4'):                            
+                            filePc = newPath + newFile +'.'+format
+                            wr['file'].setValue(filePc)
