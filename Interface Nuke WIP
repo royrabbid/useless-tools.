@@ -4,15 +4,12 @@ class SetWrite(nukescripts.PythonPanel):
                 nukescripts.PythonPanel.__init__(self, 'Write Set Up')
                 self.rpNode = node
                 #Creates Knobs
-                self.modeKnob = nuke.Enumeration_Knob('Mode', 'Select Mode ', ['Path', 'File Name ', 'Path and FileName', 'Same as Read',])                                           
+                self.modeKnob = nuke.Enumeration_Knob('Mode', 'Select Mode ', ['New Path', 'New File Name ', 'Path and FileName', 'Same as Read','Same as Read + prefix'])                                           
                 self.formKnob = nuke.Enumeration_Knob('Form', 'Format ', ['exr', 'png', 'tif', 'jpg', 'tga', 'tx'])
                 #self.CspaceKnob = nuke.Boolean_knob('CS', 'Color Space ',True) 
-                self.pathKnob = nuke.String_Knob('newName', 'New Path')
-                self.pathKnob.setVisible(True)
-                self.fileKnob = nuke.String_Knob('newName', 'New Name')
-                self.fileKnob.setVisible(True)  
+                self.pathKnob = nuke.String_Knob('newPathame', 'New Path')                
+                self.fileKnob = nuke.String_Knob('newName', 'New Name') 
                 self.prefixKnob = nuke.String_Knob('PrefixU', 'Prefix')
-                self.prefixKnob.setVisible(True)
                 #Adds Knobs         
                 for k in ( self.modeKnob, self.formKnob, self.pathKnob, self.fileKnob, self.prefixKnob):
                         self.addKnob(k)
@@ -20,22 +17,19 @@ class SetWrite(nukescripts.PythonPanel):
 sw = SetWrite(())
 sw.showModalDialog()
 
-
-
-sr = nuke.selectedNodes()
-sufix = [] 
-format = sw.formKnob.value()
-print  format
-fileMode =    #1 absoluto solo el path same name/2 absoluto el name same path/3 taken from read/4both
-newFile =  'NEWFILE'   
-newPath =   'D:/XXXXX/XXX/XXXXX/XXXXXX/XXXXX/'  
-
-
 sr = nuke.selectedNodes()
 sufix = 'SUFIX' 
-fileMode =  '1'   #1 absoluto solo el path same name/2 absoluto el name same path/3 taken from read
-newFile =  'NEWFILE'   
-newPath =   'D:/XXXXX/XXX/XXXXX/XXXXXX/XXXXX/'  
+fileMode = str(sw.modeKnob.value())
+print fileMode, type(fileMode)
+format = str(sw.formKnob.value())
+print format, type(format)
+newFile =   str(sw.fileKnob.value())
+print newFile, type(newFile) 
+newPath = str(sw.pathKnob.value()) 
+print newPath, type(newPath)
+prefix = str(sw.prefixKnob.value())
+print prefix, type(prefix)
+
 def upstream(startNode=None,nodes=None):
         if nodes is None:
             nodes = set([])
@@ -63,14 +57,23 @@ for i in sr:
     nuke.selectedNode().knob('colorspace_in').setValue('sRGB')
     nuke.createNode("Crop",inpanel=False )
     nuke.createNode("Write",inpanel=False )
-    nuke.selectedNode().knob('channels').setValue('rgb')
-    nuke.selectedNode().knob('file_type').setValue('exr')
-    nuke.selectedNode().knob('autocrop').setValue('1')
-    nuke.selectedNode().knob('metadata').setValue('no metadata')
+    if format == ('exr'):
+        nuke.selectedNode().knob('channels').setValue('rgb')
+        nuke.selectedNode().knob('file_type').setValue('exr')
+        nuke.selectedNode().knob('autocrop').setValue('1')
+        nuke.selectedNode().knob('metadata').setValue('no metadata')
+    if format == ('jpg'):
+        nuke.selectedNode().knob('channels').setValue('rgb')
+        nuke.selectedNode().knob('file_type').setValue('jpeg')
+        nuke.selectedNode().knob('_jpeg_quality').setValue('1')
+    if format == ('tga'):
+        nuke.selectedNode().knob('channels').setValue('rgb')
+        nuke.selectedNode().knob('file_type').setValue('jpeg')
+        nuke.selectedNode().knob('_jpeg_quality').setValue('1')
     sn = nuke.selectedNodes()
 
     print sn
-    #Deals with the write nodes
+    #Deals with the allthe write nodes
     for wr in sn:
         nodeList = upstream(nuke.selectedNodes())
         for nds in nodeList:
@@ -85,7 +88,7 @@ for i in sr:
                     path =  [read.knobs()['file'].value()] # prints file attr from the selected node
                     print path
                     for repl in path:
-                        if fileMode == ('1'):
+                        if fileMode == ('New Path'):
                             spa = repl.split('.') # separates the data by dots present in them.
                             forma = spa.pop(-1)
                             jptha = repl.split('/') # separates the data by dots present in them.
@@ -99,19 +102,19 @@ for i in sr:
                             filePa = newPath + jFilea +'.'+format 
                             wr['file'].setValue(filePa)
 
-                        if fileMode == ('2'):
+                        if fileMode == ('New File Name '):
                             spb = repl.split('.') # separates the data by dots present in them.
                             forma = spb.pop(-1)
                             jpthb = repl.split('/') # separates the data by dots present in them.
                             fileb = jpthb.pop(-1)
-                            jpthb = repl.split('/') # separates the data by dots present in them.
+                            jpthb = repl.split('/') # separates the data by / present in them.
                             onlyPathb = jpthb[:-1]
                             mrgb ='/'.join(onlyPathb)
                             JustPathb = mrgb + ('/')
-                            filePb = JustPathb + newFile +'.'+format
+                            filePb = JustPathb + newFile +'.'+format                            
                             wr['file'].setValue(filePb)
     
-                        if fileMode == ('3'):
+                        if fileMode == ('Same as Read + prefix'):
                             sp = repl.split('.') # separates the data by dots present in them.
                             form = sp.pop(-1)
                             jn='.'.join(sp) # merges everything
@@ -120,6 +123,15 @@ for i in sr:
                             wr['file'].setValue(finalPath)
 
 
-                        if fileMode == ('4'):                            
+                        if fileMode == ('Path and FileName'):                            
                             filePc = newPath + newFile +'.'+format
                             wr['file'].setValue(filePc)
+
+                        if fileMode == ('Same as Read'):
+                            spc = repl.split('.') # separates the data by dots present in them.
+                            formc = spc.pop(-1)
+                            jnc='.'.join(spc) # merges everything
+                            finalPathc = jnc+'.'+format   
+                            print finalPathc
+                            wr['file'].setValue(finalPathc)
+
