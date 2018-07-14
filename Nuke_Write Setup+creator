@@ -4,7 +4,7 @@ class SetWrite(nukescripts.PythonPanel):
                 nukescripts.PythonPanel.__init__(self, 'Write Set Up')
                 self.rpNode = node
                 #Creates Knobs
-                self.modeKnob = nuke.Enumeration_Knob('Mode', 'Select Mode ', ['New Path', 'New File Name ', 'Path and FileName', 'Same as Read','Same as Read + sufix'])                                           
+                self.modeKnob = nuke.Enumeration_Knob('Mode', 'Select Mode ', ['Same as Read', 'New Path', 'New File Name ', 'Path and FileName','Same as Read + sufix'])                                           
                 self.formKnob = nuke.Enumeration_Knob('Form', 'Format ', ['exr', 'png', 'tif', 'jpg', 'tga', 'tx'])
                 self.csKnob = nuke.Enumeration_Knob('addCS', 'Add ColorSpace ', ['on', 'off'])                               
                 self.pathKnob = nuke.String_Knob('newPathame', 'New Path')
