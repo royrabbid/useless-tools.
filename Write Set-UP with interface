@@ -4,15 +4,16 @@ class SetWrite(nukescripts.PythonPanel):
                 nukescripts.PythonPanel.__init__(self, 'Write Set Up')
                 self.rpNode = node
                 #Creates Knobs
-                self.modeKnob = nuke.Enumeration_Knob('Mode', 'Select Mode ', ['New Path', 'New File Name ', 'Path and FileName', 'Same as Read','Same as Read + sufix'])                                           
-                self.formKnob = nuke.Enumeration_Knob('Form', 'Format ', ['exr', 'png', 'tif', 'jpg', 'tga', 'tx'])                
+                self.modeKnob = nuke.Enumeration_Knob('Mode', 'Select Mode ', ['Same as Read', ,'Same as Read + sufix', 'New Path', 'New File Name ', 'Path and FileName'])                                           
+                self.formKnob = nuke.Enumeration_Knob('Form', 'Format ', ['exr', 'png', 'tif', 'jpg', 'tga', 'tx'])
+                self.csKnob = nuke.Enumeration_Knob('addCS', 'Add ColorSpace ', ['on', 'off'])                               
                 self.pathKnob = nuke.String_Knob('newPathame', 'New Path')
                 self.pathKnob.setVisible(True)               
                 self.fileKnob = nuke.String_Knob('newFile', 'New File') 
                 self.fileKnob.setVisible(True) 
                 self.sufixKnob = nuke.String_Knob('PrefixU', 'Prefix')
                 #Adds Knobs         
-                for k in ( self.modeKnob, self.formKnob, self.pathKnob, self.fileKnob, self.sufixKnob ):
+                for k in ( self.modeKnob, self.formKnob, self.pathKnob, self.fileKnob, self.sufixKnob, self.csKnob ):
                         self.addKnob(k)
     def KnobChanged( self,modeKnob ):
         if selfModeKnob ==('New fileName', 'Same as Read', 'Same as Read + sufix'):
