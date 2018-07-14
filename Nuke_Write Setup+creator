@@ -134,13 +134,13 @@ for i in sr:
                                 filePb = JustPathb + newFile +'.'+format                            
                                 wr['file'].setValue(filePb)
         
-                            if fileMode == ('Same as Read + prefix'):
-                                sp = repl.split('.') # separates the data by dots present in them.
-                                form = sp.pop(-1)
-                                jn='.'.join(sp) # merges everything
-                                finalPath = jn+'_'+sufix+'.'+format   
-                                print finalPath
-                                wr['file'].setValue(finalPath)
+                            if fileMode == ('Same as Read + sufix'):
+                                spd = repl.split('.') # separates the data by dots present in them.
+                                formd = spd.pop(-1)
+                                jnd='.'.join(spd) # merges everything
+                                finalPathd = jnd+'_'+sufix+'.'+format   
+                                print finalPathd
+                                wr['file'].setValue(finalPathd)
     
     
                             if fileMode == ('Path and FileName'):                            
@@ -233,13 +233,13 @@ for i in sr:
                                 filePb = JustPathb + newFile +'.'+format                            
                                 wr['file'].setValue(filePb)
         
-                            if fileMode == ('Same as Read + prefix'):
-                                sp = repl.split('.') # separates the data by dots present in them.
-                                form = sp.pop(-1)
-                                jn='.'.join(sp) # merges everything
-                                finalPath = jn+'_'+sufix+'.'+format   
-                                print finalPath
-                                wr['file'].setValue(finalPath)
+                             if fileMode == ('Same as Read + sufix'):
+                                spd = repl.split('.') # separates the data by dots present in them.
+                                formd = spd.pop(-1)
+                                jnd='.'.join(spd) # merges everything
+                                finalPathd = jnd+'_'+sufix+'.'+format   
+                                print finalPathd
+                                wr['file'].setValue(finalPathd)                           
     
     
                             if fileMode == ('Path and FileName'):                            
