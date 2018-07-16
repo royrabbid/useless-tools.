@@ -50,6 +50,7 @@ def upstream(startNode=None,nodes=None):
         return list(nodes)
 
 def create_write():
+    global sw
     sw = SetWrite(())
     Accepted = sw.showModalDialog()
     if Accepted:
