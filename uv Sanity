@@ -7,6 +7,12 @@ noUV = []
 badUv = []
 dicc = {}
 shellAmount = 0 
+objAmount = len(objSel)
+
+if objAmount == 0:
+    raise Exception("No meshes selected")
+   
+
 gMainProgressBar = maya.mel.eval('$tmp = $gMainProgressBar')
 
 cmds.progressBar( gMainProgressBar,
@@ -16,6 +22,8 @@ cmds.progressBar( gMainProgressBar,
 				status='Evaluating Uvs, wait!!! it takes time man!! ...',
 				maxValue= len(objSel) )
 
+    
+    
 for o in objSel:
     if cmds.progressBar(gMainProgressBar, query=True, isCancelled=True ) :
         break
