@@ -7,8 +7,19 @@ noUV = []
 badUv = []
 dicc = {}
 shellAmount = 0 
+gMainProgressBar = maya.mel.eval('$tmp = $gMainProgressBar')
+
+cmds.progressBar( gMainProgressBar,
+				edit=True,
+				beginProgress=True,
+				isInterruptable=True,
+				status='Evaluating Uvs, wait!!! it takes time man!! ...',
+				maxValue= len(objSel) )
 
 for o in objSel:
+    if cmds.progressBar(gMainProgressBar, query=True, isCancelled=True ) :
+        break
+    cmds.progressBar(gMainProgressBar, edit=True, step=1)
     cmds.select(o)
     nouv = cmds.polyEvaluate(uvcoord=True)
     if nouv == 0:
@@ -43,7 +54,7 @@ for o in objSel:
             print '                     ','xAverage is:', xAvr
             print '                     ','yAverage is:', yAvr
             print '-'*200
-
+cmds.progressBar(gMainProgressBar, edit=True, endProgress=True)
 print 'Results'            
 print '-'*200            
 print 'number of shells:', shellAmount
@@ -63,8 +74,8 @@ for noUV in noUV:
 cmds.select(cmds.polyListComponentConversion(tf = True))
 print '-'*200
 if len(noUV) > 0:
-   cmds.warning ("There are GEOS with no UVs, see the script editor") 
+   cmds.warning ("There are GEOS with no UVs!!!!!, see the script editor.") 
 if len(badUv) > 0:
-    cmds.warning ("There are UVs outside it uvTile, see the script editor") 
-if len(badUv) > 0 and  len(badUv) > 0:
-    cmds.warning ("There are UVs outside it uvTile and some GEO doesn't have any UVs, see the script editor")
+    cmds.warning ("There are UVs outside it uvTile!!!!!!!, see the script editor") 
+if len(badUv) > 0 and  len(noUV) > 0:
+    cmds.warning ("There are UVs outside it uvTile and some GEO doesn't have any UVs!!!!!!, see the script editor ")
