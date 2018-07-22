@@ -1,0 +1,101 @@
+import maya.cmds as cmds
+####-----------Interface--------------------------######
+
+if cmds.window( ren, exists = True ):
+    cmds.deleteUI(ren)
+    cmds.showWindow(ren)
+global newNameUI
+global ren
+ren = cmds.window('RNMR', t='Renamer Tool v02', mnb = False, mxb = False, wh=(500,200), sizeable = False)
+cmds.columnLayout(adj=True, cal="center")
+newNameUI = cmds.textFieldGrp( l='New Name: ', editable=True)
+startNumberUI = cmds.textFieldGrp( l='Start Number: ', editable=True, tx='01')
+paddingUI = cmds.intSliderGrp( l='Padding: ',min = 2, max = 7, field = True, value=3)
+incrementUI = cmds.textFieldGrp( l='Increment Number: ', editable=True, tx='1')
+cmds.separator (h= 10)
+cmds.button(l="Rename!!!", command='goScript()')
+cmds.separator (h= 10)
+cmds.button(label="Cancel",command = 'closeWin()')
+cmds.separator (h= 10)
+cmds.showWindow(ren)
+    
+
+###---------------Cancel----------------------------#####
+def closeWin():
+    print 'Cancelling Cat of the Plan'
+    cmds.deleteUI(ren)
+ 
+
+###--------------------When Hit ok----------------------#####
+def goScript():
+    objSel = cmds.ls(sl = True)
+    objAmount = len(objSel)
+    if objAmount == (0):
+        raise Exception("Nothing Selected Old Woman!!!!")
+    newName = str(cmds.textFieldGrp(newNameUI, q=True, text = True))
+    padding = int(cmds.intSliderGrp(paddingUI, q=True, value = True ))    
+    startCount = int(cmds.textFieldGrp( startNumberUI, q=True, text=True))
+    increment = int(cmds.textFieldGrp(incrementUI,q=True, text=True ))
+    firstRen =objSel.pop(0)
+    objAmount = len(objSel)
+    if objAmount == (0):
+        raise Exception("Nothing Selected Old Woman!!!!")
+    gMainProgressBar = maya.mel.eval('$tmp = $gMainProgressBar')
+
+    cmds.progressBar( gMainProgressBar,
+                                        edit=True,beginProgress=True,
+                                        isInterruptable=True,
+                                        status='Evaluating Uvs, wait!!! it takes time man!! ...',
+                                        maxValue= len(objSel) )
+    if padding == (2):
+        cmds.rename( firstRen, newName+'_'+"%02d" % startCount)
+        for i in objSel: 
+            if cmds.progressBar(gMainProgressBar, query=True, isCancelled=True ) :
+                break
+            cmds.progressBar(gMainProgressBar, edit=True, step=1)
+            startCount = startCount+increment                
+            cmds.rename( i, newName+'_'+"%02d" % startCount)
+            
+    if padding == (3):
+        cmds.rename( firstRen, newName+'_'+"%03d" % startCount)
+        for i in objSel:
+            if cmds.progressBar(gMainProgressBar, query=True, isCancelled=True ) :
+                break
+            cmds.progressBar(gMainProgressBar, edit=True, step=1)             
+            startCount = startCount+increment            
+            cmds.rename( i, newName+'_'+"%03d" % startCount)    
+    if padding == (4):
+        cmds.rename( firstRen, newName+'_'+"%04d" % startCount)
+        for i in objSel:
+            if cmds.progressBar(gMainProgressBar, query=True, isCancelled=True ) :
+                break
+            cmds.progressBar(gMainProgressBar, edit=True, step=1)             
+            startCount = startCount+increment    
+            cmds.rename( i, newName+'_'+"%04d" % startCount)       
+    if padding == (5):
+        cmds.rename( firstRen, newName+'_'+"%05d" % startCount)
+        for i in objSel:
+            if cmds.progressBar(gMainProgressBar, query=True, isCancelled=True ) :
+                break
+            cmds.progressBar(gMainProgressBar, edit=True, step=1)             
+            startCount = startCount+increment    
+            cmds.rename( i, newName+'_'+"%05d" % startCount)   
+    if padding == (6):
+        cmds.rename( firstRen, newName+'_'+"%06d" % startCount)
+        for i in objSel: 
+            if cmds.progressBar(gMainProgressBar, query=True, isCancelled=True ) :
+                break
+            cmds.progressBar(gMainProgressBar, edit=True, step=1)
+            startCount = startCount+increment    
+            cmds.rename( i, newName+'_'+"%06d" % startCount) 
+    if padding == (7):
+        cmds.rename( firstRen, newName+'_'+"%07d" % startCount)
+        for i in objSel:
+            if cmds.progressBar(gMainProgressBar, query=True, isCancelled=True ) :
+                break
+            cmds.progressBar(gMainProgressBar, edit=True, step=1) 
+            startCount = startCount+increment    
+            cmds.rename( i, newName+'_'+"%07d" % startCount)
+    cmds.progressBar(gMainProgressBar, edit=True, endProgress=True) 
+    print '-'*200       
+    print 'Total Geos Renamed:',len(objSel) + 1 
