@@ -1,24 +1,34 @@
+#----Maya Renamer Tool V_0.3------------
 import maya.cmds as cmds
 ####-----------Interface--------------------------######
-
-if cmds.window( ren, exists = True ):
-    cmds.deleteUI(ren)
+def win():
+    global newNameUI
+    global ren
+    ren = cmds.window( t='Renamer Tool v02', mnb = False, mxb = False, wh=(500,200), sizeable = False)
+    cmds.columnLayout(adj=True, cal="center")
+    global newNameUI
+    newNameUI = cmds.textFieldGrp( l='New Name: ', editable=True)
+    global startNumberUI
+    startNumberUI = cmds.textFieldGrp( l='Start Number: ', editable=True, tx='01')
+    global paddingUI
+    paddingUI = cmds.intSliderGrp( l='Padding: ',min = 2, max = 7, field = True, value=3)
+    global incrementUI
+    incrementUI = cmds.textFieldGrp( l='Increment Number: ', editable=True, tx='1')
+    cmds.separator (h= 10)
+    cmds.button(l="Rename!!!", command='goScript()')
+    cmds.separator (h= 10)
+    cmds.button(label="Cancel",command = 'closeWin()')
+    cmds.separator (h= 10)
     cmds.showWindow(ren)
-global newNameUI
-global ren
-ren = cmds.window('RNMR', t='Renamer Tool v02', mnb = False, mxb = False, wh=(500,200), sizeable = False)
-cmds.columnLayout(adj=True, cal="center")
-newNameUI = cmds.textFieldGrp( l='New Name: ', editable=True)
-startNumberUI = cmds.textFieldGrp( l='Start Number: ', editable=True, tx='01')
-paddingUI = cmds.intSliderGrp( l='Padding: ',min = 2, max = 7, field = True, value=3)
-incrementUI = cmds.textFieldGrp( l='Increment Number: ', editable=True, tx='1')
-cmds.separator (h= 10)
-cmds.button(l="Rename!!!", command='goScript()')
-cmds.separator (h= 10)
-cmds.button(label="Cancel",command = 'closeWin()')
-cmds.separator (h= 10)
-cmds.showWindow(ren)
     
+
+def launchW():
+    if cmds.window( ren, exists = True ):
+        cmds.deleteUI(ren)
+        win()
+    else:
+        win()   
+
 
 ###---------------Cancel----------------------------#####
 def closeWin():
@@ -99,3 +109,5 @@ def goScript():
     cmds.progressBar(gMainProgressBar, edit=True, endProgress=True) 
     print '-'*200       
     print 'Total Geos Renamed:',len(objSel) + 1 
+    
+launchW()
