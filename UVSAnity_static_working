@@ -1,9 +1,9 @@
-######----------Sanity UV_V4------------------------
+######----------Sanity UV_V6------------------------
 import maya.cmds as cmds
 import math
 import pymel.core as pm
 import maya.mel as mel
-objSel = cmds.ls(sl=True)
+objSel = cmds.ls(type =  "mesh")
 
 objAmount = len(objSel)    
 def sanitize():    
@@ -104,12 +104,12 @@ stat = 0
 def statW():
     
     if len(noUV) > 0: 
-        global Men
-        Men = "There are GEOS with no UVs!!!!!, see the script editor." 
+        global MenNo
+        MenNo = "There are GEOS with no UVs!!!!!" 
     else:
-    	Men = "All Good"
+    	MenNo = "Every Geo has UVs!"
     if len(badUv) > 0:
-        Men = "There are UVs outside it uvTile!!!!!!!, see the script editor"
+        Men = "There are UVs outside it uvTile!!!!!!!"
     else:
     	Men = "All Good"
     if len(badUv) > 0 and  len(noUV) > 0:
@@ -130,7 +130,8 @@ def statW():
     global noUvUI
     noUvUI = cmds.text( '                                Geo with no UVs:                   %s' % noUVT, al='left')
     cmds.separator (h= 10)
-    warnUI = cmds.text( '    Result:!  %s' % Men)
+    warnUI = cmds.text( '    Result out of Range Uvs:  %s' % Men)
+    warnUI2 = cmds.text( '    Result no Uvs:  %s' % MenNo)
     cmds.separator (h= 10)
     print stat, '$$$'
     cmds.button(l="Got it!", command="cmds.deleteUI('mywin')")
