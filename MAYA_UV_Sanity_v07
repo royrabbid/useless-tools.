@@ -1,0 +1,171 @@
+######----------Sanity UV_V7------------------------
+import maya.cmds as cmds
+import math
+import pymel.core as pm
+import maya.mel as mel
+global firstSel
+firstSel = cmds.ls(sl=True,)
+objSel = []
+noMesh = []
+for i in firstSel:
+    shapeNode = cmds.listRelatives( i, shapes=True)
+    print 'shapeNodeReturn',shapeNode
+    if cmds.nodeType(shapeNode) == "mesh":
+        objSel.append(i)
+        print i,"es mesh"        
+    else:
+        noMesh.append(i)
+        print i, "no es mesh"
+noMeshAM = len(noMesh)
+allSel = len(firstSel)
+objAmount = len(objSel) 
+
+
+def sanitize():    
+
+    gMainProgressBar = maya.mel.eval('$tmp = $gMainProgressBar')
+    
+    cmds.progressBar( gMainProgressBar,
+    				edit=True,
+    				beginProgress=True,
+    				isInterruptable=True,
+    				status='Evaluating Uvs, wait!!! it takes time man!! ...',
+    				maxValue= len(objSel) )    				
+    global noUV        
+    noUV = []   
+    global badUv
+    badUv = []
+    dicc = {}
+    global shellAmount
+    shellAmount = 0 
+    for o in objSel:
+        if cmds.progressBar(gMainProgressBar, query=True, isCancelled=True ) :
+            break
+        cmds.progressBar(gMainProgressBar, edit=True, step=1)
+        cmds.select(o)
+        cmds.delete(ch=True)
+        nouv = cmds.polyEvaluate(uvcoord=True)
+        if nouv == 0:
+            noUV.append(o) 
+            
+        shellsNum = pm.polyEvaluate(us=True) 
+        shellAmount = shellAmount + shellsNum
+        sids = []
+
+        for sid in range(0,shellsNum):
+            selectUVShell = cmds.select (pm.polyEvaluate(uis=sid))
+            bBox = cmds.polyEvaluate(bc2=True)
+            xMin = bBox[0][0]
+            xMax = bBox[0][1]
+            yMin = bBox[1][0]
+            yMax = bBox[1][1]
+            xAvr = (xMin + xMax) /2
+            yAvr = (yMin + yMax) /2
+            minRangex = math.floor(xAvr)
+            maxRangex = math.ceil(xAvr) 
+            minRangey = math.floor(yAvr)
+            maxRangey = math.ceil(yAvr)
+            
+            if xMin < minRangex or xMax > maxRangex or yMin < minRangey or yMax > maxRangey or xMin < 0 or xMax > 10 or yMin < 0:
+                badUv.append(sid)
+                sids.append(sid)
+                dicc[o]=sids
+                print "UVs out side it's tile in shell %d" % sid, objSel 
+                print o,', shellId: ',sid,':','xMin is:', xMin, ',min Range is:', minRangex
+                print '                     ','xMax is:', xMax, ',max Range is:', maxRangex
+                print '                     ','yMin is:', yMin, ',min Range is:', minRangey
+                print '                     ','yMax is:', yMax,  ',max Range is:', maxRangey
+                print '                     ','xAverage is:', xAvr
+                print '                     ','yAverage is:', yAvr
+                print '-'*200
+    cmds.progressBar(gMainProgressBar, edit=True, endProgress=True)
+    print 'Results'            
+    print '-'*200            
+    print 'number of shells:', shellAmount
+    
+    print 'number of uvShells outside its UV tile', len(badUv)
+    
+    print 'geo with no UVs', noUV
+    cmds.select(d=True)
+    for key, value in dicc.items():         
+            cmds.select (key, af=True)
+            for bShels in value:
+               cmds.select(pm.polyEvaluate(uis=bShels),add=True)
+    for transf in objSel:
+        cmds.select(transf, d=True)
+    for noUV in noUV:
+        cmds.select(noUV, add=True)
+    cmds.select(cmds.polyListComponentConversion(tf = True))
+    print '-'*200
+    if len(noUV) > 0:
+       cmds.warning ("There are GEOS with no UVs!!!!!, see the script editor.") 
+    if len(badUv) > 0:
+        cmds.warning ("There are UVs outside it uvTile!!!!!!!, see the script editor") 
+    if len(badUv) > 0 and  len(noUV) > 0:
+        cmds.warning ("There are UVs outside it uvTile and some GEO doesn't have any UVs!!!!!!, see the script editor ")
+
+####-----Here Starts!!!---------------------####
+if objAmount == 0:
+    raise Exception("No meshes selected")
+else:
+    sanitize()
+
+
+#--------windows Variables-----------------------------------
+
+#stat = cmds.window( t='UV Sanity Results', mnb = False, mxb = False, wh=(600,150), sizeable = False)
+global stat
+stat = 0
+
+def statW():
+    
+    if len(noUV) > 0: 
+        global MenNo
+        MenNo = "There are GEOS with no UVs!!!!!" 
+    else:
+    	MenNo = "Every Geo has UVs!"
+    if len(badUv) > 0:
+        Men = "There are UVs outside it uvTile!!!!!!!"
+    else:
+    	Men = "All Good"
+    if len(badUv) > 0 and  len(noUV) > 0:
+        Men = "There are UVs outside it uvTile.!"
+    else:
+    	Men = "All Good"
+    if len(noUV) > 0:
+        global noUVT
+        noUVT = 'Yes'
+    if len(noUV) == 0:
+        noUVT = 'No'
+       
+    stat = cmds.window( 'mywin', t='UV Sanity_V07', mnb = False, mxb = False, wh=(600,900), sizeable = False)
+    cmds.columnLayout(adj=True, cal="center")
+    totalObejcts = cmds.text( '                                Objects Selected:                    %d' % len(firstSel), al='left')
+    noMeshes = cmds.text( '                                No Meshes:                             %d' % len(noMesh), al='left')
+    Meshes = cmds.text( '                                Meshes Processed:                 %d' % len(objSel), al='left')
+    global shellAmUI
+    cmds.separator (h= 10)
+    shellAmUI = cmds.text( '                                Shell Processed:                      %d' % shellAmount, al='left')
+    shellOutUI = cmds.text('                                Shells outside their tile:         %d' % len(badUv), al='left')
+    global noUvUI
+    noUvUI = cmds.text( '                                Geo with no UVs:                   %s' % len(noUV), al='left')
+    cmds.separator (h= 10)
+    warnUI = cmds.text( '    Result out of Range Uvs:  %s' % Men)
+    warnUI2 = cmds.text( '    Result no Uvs:  %s' % MenNo)
+    cmds.separator (h= 10)
+    print stat, '$$$'
+    cmds.button(l="Got it!", command="cmds.deleteUI('mywin')")
+    cmds.separator (h= 10)
+    cmds.showWindow(stat)
+    
+    
+def goWin():
+
+    if cmds.window( 'mywin', exists = True ):
+        cmds.deleteUI('mywin')
+        statW()
+    else:
+        statW()
+        
+goWin()
+    
