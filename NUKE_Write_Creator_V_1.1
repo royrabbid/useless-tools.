@@ -130,17 +130,16 @@ def goScript():
                             print path
                             for repl in path:
                                 if fileMode == ('New Path'):
-                                    spa = repl.split('.') # separates the data by dots present in them.
-                                    forma = spa.pop(-1)
-                                    jptha = repl.split('/') # separates the data by dots present in them.
-                                    filea = jptha.pop(-1)
-                                    fSplit = filea.split('.')
-                                    jFilea = fSplit[-2]
-                                    jptha = repl.split('/') # separates the data by dots present in them.
-                                    onlyPatha = jptha[-2]
-                                    mrga ='/'.join(onlyPatha)
-                                    JustPatha = mrga + ('/')
-                                    filePa = newPath +'/'+ jFilea +'.'+format 
+                                    split01 = repl.split('/')
+                                    justName = split01.pop(-1)
+                                    split02 = justName.split('.')
+                                    noformat = split02.pop(-1)
+                                    onlyName = '.'.join(split02)
+                                    print 'ONLYNAME', onlyName
+                                    justPath =  '/'.join(split01)+'/'
+                                    print 'originalPath is ', justPath
+                                    filePa = newPath+'/'+ onlyName +'.'+ formatA
+                                    print filePa
                                     wr['file'].setValue(filePa)
         
                                 if fileMode == ('New File Name '):
@@ -229,15 +228,16 @@ def goScript():
                             print path
                             for repl in path:
                                 if fileMode == ('New Path'):
-                                    sp = repl.split('/')
-                                    fileA = sp.pop(-1)
-                                    split = fileA.split('.')
-                                    noform = split.pop(-1)
-                                    fileName = ('.').join(split)
-                                    jn = ('/').join(sp)
-                                    fjn = jn+'/'
-                                    finalpath = fjn+fileName
-                                    filePa = newPath+'/'+fileName +'.'+format 
+                                    split01 = repl.split('/')
+                                    justName = split01.pop(-1)
+                                    split02 = justName.split('.')
+                                    noformat = split02.pop(-1)
+                                    onlyName = '.'.join(split02)
+                                    print 'ONLYNAME', onlyName
+                                    justPath =  '/'.join(split01)+'/'
+                                    print 'originalPath is ', justPath
+                                    filePa = newPath+'/'+ onlyName +'.'+ formatA
+                                    print filePa
                                     wr['file'].setValue(filePa)
         
                                 if fileMode == ('New File Name '):
