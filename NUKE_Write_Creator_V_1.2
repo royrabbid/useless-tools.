@@ -67,7 +67,7 @@ def goScript():
     newPath = str(sw.pathKnob.value())
     addColor = str(sw.csKnob.value())
     print 'addColor"', addColor, type(addColor)
-
+    number = 0000
 
     # creates the colorspace and the write nodes
     for i in sr:
@@ -165,7 +165,7 @@ def goScript():
         
         
                                 if fileMode == ('Path and FileName'):                            
-                                    filePc = newPath +'/'+ newFile + str(number)+'.'+format
+                                    filePc = newPath +'/'+ newFile +'_' + str(number)+'.'+format
                                     wr['file'].setValue(filePc)
         
                                 if fileMode == ('Same as Read'):
@@ -264,7 +264,7 @@ def goScript():
         
         
                                 if fileMode == ('Path and FileName'):                            
-                                    filePc = newPath +'/'+ newFile + str(number)+'.'+format
+                                    filePc = newPath +'/'+ newFile +'_' + str(number)+'.'+format
                                     wr['file'].setValue(filePc)
         
                                 if fileMode == ('Same as Read'):
