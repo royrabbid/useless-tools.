@@ -119,6 +119,7 @@ def goScript():
             nuke.invertSelection()# DESELECTS
             i.setSelected(True) 
         # CREATES THE NODES AND SETS THEM UP
+        nuke.createNode("Dot",inpanel=False )
         if addColor == ('on'):
             nuke.createNode("Colorspace",inpanel=False )
             nuke.selectedNode().knob('colorspace_in').setValue('sRGB')
@@ -160,9 +161,9 @@ def goScript():
         print wr
         # SETS THE WRITE NODE
         if fileMode == ('Same as Read'):
-            finalPath = path + file + '.' + format   
+            finalPath = path + '/' + file + '.' + format   
         if fileMode == ('Same as Read + sufix'):
-            finalPath = path + file + '_' + sufix +  '.' + format   
+            finalPath = path + '/' + file + '_' + sufix +  '.' + format   
         if fileMode == ('New File Name '):
             finalPath = path + '/' + newFile + '.' + format   
         if fileMode == ('New Path'):
