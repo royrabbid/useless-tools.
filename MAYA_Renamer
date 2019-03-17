@@ -5,7 +5,7 @@ ren = 0
 def win():
     global newNameUI
     global ren
-    ren = cmds.window( t='Renamer Tool v02', mnb = False, mxb = False, wh=(500,200), sizeable = False)
+    ren = cmds.window( t='Renamer Tool v04', mnb = False, mxb = False, wh=(500,200), sizeable = False)
     cmds.columnLayout(adj=True, cal="center")
     global newNameUI
     newNameUI = cmds.textFieldGrp( l='New Name: ', editable=True)
