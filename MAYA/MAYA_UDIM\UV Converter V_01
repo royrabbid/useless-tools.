@@ -1,0 +1,141 @@
+import maya.cmds as mc
+import os
+
+
+####-----------Interface--------------------------######
+ren = 0
+def win():
+    global newNameUI
+    global ren
+    ren = cmds.window( t='Mari/Mudbox file converter V_01', mnb = False, mxb = False, wh=(500,200), sizeable = False)
+    cmds.columnLayout(adj=True, cal="center")
+    cmds.separator (h= 10)
+    cmds.button(l="MUDBOX > MARI (UV to UDIM)", command='MudToMari()')
+    cmds.separator (h= 10)
+    cmds.button(label="MARI > MUD (UDIM to UV)",command = 'UDIMtoUV()')
+    cmds.separator (h= 10)
+    cmds.button(label="Cancel",command = 'closeWin()')
+    cmds.separator (h= 10)
+    cmds.showWindow(ren)
+
+    
+
+def launchW():
+    if cmds.window( ren, exists = True ):
+        cmds.deleteUI(ren)
+        win()
+    else:
+        win()
+
+###---------------Cancel----------------------------#####
+def closeWin():
+    print 'Cancelling Cat of the Plan'
+    cmds.deleteUI(ren)
+    
+############################################################################## 
+#           From Mudbox to Mari Mud uses U1_V1 as the first tile             #
+############################################################################## 
+
+
+#print folder
+#print len(folder)
+def MudToMari():
+    folder=cmds.fileDialog2(cap="locate folder",fm=4)
+    for f in folder:
+        #print f
+        fileName = f.split("/")[-1]
+        path = f.split("/")[:-1]
+        fPath = ('/').join(path)
+        fnNofor = fileName.split(".")[:-1]
+        ext = fileName.split('.')[-1]
+        just = fnNofor[-1]
+        notation = just.split("_")
+        #print notation
+        userFilename = notation[0]
+        mudNum = notation[1:]
+        #print mudNum
+        u = mudNum[0]
+        uStr =u.encode ('ascii', 'ignore')
+        v = str(mudNum[-1])
+        vStr =v.encode ('ascii', 'ignore')    
+        uInt = int(u.replace("u",""))
+        vInt = int(v.replace('v',''))
+        newNotation = 1000+(uInt)+((vInt-1)*10)
+        newFileName = userFilename+'_'+str(newNotation)+'.'+ext
+        finalPath = str(fPath)+'/'+newFileName
+        #print finalPath
+        try:  
+            os.rename('%s'%f,'%s'%finalPath) 
+        except:
+            print 'Existing File', finalPath
+            raise Exception("Some Files Already exists!!!!")
+       
+        print 'Converted UV', uStr +'_'+ vStr , 'into UDIM:',newNotation
+    print 'Amount of files processed:', len(folder)
+
+    
+############################################################################## 
+#           From Mari to Mud Mari uses 1001 as the first tile               #
+############################################################################## 
+import maya.cmds as mc
+import os
+
+
+
+#print folder
+#print len(folder)
+
+def UDIMtoUV():
+    folder=cmds.fileDialog2(cap="locate folder",fm=4)
+    for f in folder:
+        #print f
+        fileName = f.split("/")[-1]
+        #print "file name is...", fileName
+        path = f.split("/")[:-1]
+        #print "file path is..", path
+        fPath = ('/').join(path)
+        #print fPath
+        fnNofor = fileName.split(".")[:-1]
+        #print "Without the Extension the file is named..", fnNofor
+        ext = fileName.split('.')[-1]
+        #print ext
+        just = fnNofor[-1]
+        #print just
+        notation = just.split("_")
+        #print notation
+        userFilename = notation[0]
+        #print "The name of the file is:", userFilename
+        mariNum = notation[1:]
+        #print "The Mari's tile number is:", mariNum
+        mNol = mariNum[-1]
+        #print mNol, type(mNol)
+        udim = int(mNol.encode ('ascii', 'ignore'))
+        #print udim, type(udim)
+        udim_string = str(udim)
+        u = int(udim_string [-1])
+        #print u
+        if u == 0:
+            #print 'si es cero'
+            u = u + 10 
+        #print u
+        v = ((udim - 1000 - u)/10)+1
+        #print v
+        u = udim - 1000 - ((v-1)*10)
+        #print u    
+        uv = 'u'+str(u)+'_'+'v'+str(v)
+        print uv, 'UDIM convertion to ', udim 
+        fname = fPath+'/'+userFilename+'_'+uv+'.'+ext
+        #print fname 
+    
+        try:  
+            os.rename('%s'%f,'%s'%fname) 
+        except:
+            print 'Existing File', fname
+            raise Exception("Some Files Already exists!!!!")
+            
+            
+    print 'Amount of files processed', len(folder)
+
+
+    
+launchW()
