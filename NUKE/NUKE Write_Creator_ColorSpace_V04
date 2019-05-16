@@ -130,40 +130,40 @@ def goScript():
         if addColor == ('on'):
             nuke.createNode("OCIOColorSpace",inpanel=False )
             nuke.selectedNode().knob('in_colorspace').setValue('project')
-            nuke.selectedNode().knob('reformat').setValue('true')
         if addCrop == ('on'):
             nuke.createNode("Crop",inpanel=False )
+            nuke.selectedNode().knob('reformat').setValue('true' )
         nuke.createNode("Write",inpanel=False )
         if format == ('exr'):
-            nuke.selectedNode().knob('channels').setValue('rgba')
+            nuke.selectedNode().knob('channels').setValue('rgb')
             nuke.selectedNode().knob('file_type').setValue('exr')
             nuke.selectedNode().knob('autocrop').setValue('1')
             nuke.selectedNode().knob('metadata').setValue('no metadata')
             nuke.selectedNode().knob('create_directories').setValue(True)
         if format == ('png'):
-            nuke.selectedNode().knob('channels').setValue('rgba')
+            nuke.selectedNode().knob('channels').setValue('rgb')
             nuke.selectedNode().knob('file_type').setValue('jpeg')
             nuke.selectedNode().knob('_jpeg_quality').setValue('1')
             nuke.selectedNode().knob('datatype').setValue('16 bit')
             nuke.selectedNode().knob('create_directories').setValue(True)
         if format == ('jpg'):
-            nuke.selectedNode().knob('channels').setValue('rgba')
+            nuke.selectedNode().knob('channels').setValue('rgb')
             nuke.selectedNode().knob('file_type').setValue('jpeg')
             nuke.selectedNode().knob('_jpeg_quality').setValue('1')
             nuke.selectedNode().knob('create_directories').setValue(True)
         if format == ('tga'):
-            nuke.selectedNode().knob('channels').setValue('rgba')
+            nuke.selectedNode().knob('channels').setValue('rgb')
             nuke.selectedNode().knob('file_type').setValue('targa')
             nuke.selectedNode().knob('compression').setValue('RLE')
             nuke.selectedNode().knob('create_directories').setValue(True)
         if format == ('tif'):
-            nuke.selectedNode().knob('channels').setValue('rgba')
+            nuke.selectedNode().knob('channels').setValue('rgb')
             nuke.selectedNode().knob('file_type').setValue('tiff')
             nuke.selectedNode().knob('datatype').setValue('16 bit')
             nuke.selectedNode().knob('compression').setValue('LZW')
             nuke.selectedNode().knob('create_directories').setValue(True)
         if format == ('tx'):
-            nuke.selectedNode().knob('channels').setValue('rgba')
+            nuke.selectedNode().knob('channels').setValue('rgb')
             nuke.selectedNode().knob('file_type').setValue('tx')
             nuke.selectedNode().knob('metadata').setValue('no metadata')
             nuke.selectedNode().knob('create_directories').setValue(True)
@@ -175,7 +175,8 @@ def goScript():
         if fileMode == ('Same as Read + sufix'):
             finalPath = path + '/' + file + '_' + sufix +  '.' + format   
         if fileMode == ('New File Name '):
-            finalPath = path + '/' + newFile + '.' + format   
+            num += 1
+            finalPath = path + '/' + newFile + '_' + str(num) + '.' + format   
         if fileMode == ('New Path'):
             finalPath = fNewPath + '/' + file + '.' + format
         if fileMode == ('Path and FileName'):
