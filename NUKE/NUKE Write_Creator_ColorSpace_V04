@@ -130,6 +130,7 @@ def goScript():
         if addColor == ('on'):
             nuke.createNode("OCIOColorSpace",inpanel=False )
             nuke.selectedNode().knob('in_colorspace').setValue('project')
+            nuke.selectedNode().knob('reformat').setValue('true')
         if addCrop == ('on'):
             nuke.createNode("Crop",inpanel=False )
         nuke.createNode("Write",inpanel=False )
