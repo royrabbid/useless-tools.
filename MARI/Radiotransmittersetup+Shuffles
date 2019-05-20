@@ -1,0 +1,59 @@
+geo = mari.geo.current()
+ng = geo.nodeGraph()
+selectedNodeList = ng.selectedNodeList()
+keep = []
+for each in selectedNodeList:
+    name = each.name()
+    #print name 
+    selectedNodeListUp = ng.getUpstreamNodes(each)
+    #print selectedNodeList 
+
+    for node in selectedNodeListUp:
+        #print node.name()
+        if 'Paint' in node.name():
+            #print 'True'
+            keep.append(node)
+            node.setNodeName(name)
+            #Transmission01
+            radioT = ng.createNode("Misc/Extension Pack/Radio Transmitter")
+            radioT.setInputNode("Input",node)
+            radioT.setNodeName('utl_ %s' % name)
+            #ShuffleR
+            shuR= ng.createNode("Filter/Shuffle")
+            shuR.setInputNode("Input",node)
+            shuR.setNodeName("shuffle_R")
+            shuR.setMetadata("CompR","r" )
+            shuR.setMetadata("CompG","r" )
+            shuR.setMetadata("CompB","r" )
+            shuT = ng.createNode("Misc/Extension Pack/Radio Transmitter")            
+            shuT.setInputNode("Input", shuR)
+            shuT.setNodeName('utl_ %s_R' % name)            
+            #ShuffleG
+            shuG= ng.createNode("Filter/Shuffle")
+            shuG.setInputNode("Input",node)
+            shuG.setNodeName("shuffle_G")
+            shuG.setMetadata("CompR","g" )
+            shuG.setMetadata("CompG","g" )
+            shuG.setMetadata("CompB","g" )
+            shuTg = ng.createNode("Misc/Extension Pack/Radio Transmitter")            
+            shuTg.setInputNode("Input", shuG)
+            shuTg.setNodeName('utl_ %s_G' % name)
+            #ShuffleB
+            shuB= ng.createNode("Filter/Shuffle")
+            shuB.setInputNode("Input",node)
+            shuB.setNodeName("shuffle_B")
+            shuB.setMetadata("CompR","b" )
+            shuB.setMetadata("CompG","b" )
+            shuB.setMetadata("CompB","b" )
+            shuTb = ng.createNode("Misc/Extension Pack/Radio Transmitter")            
+            shuTb.setInputNode("Input", shuB)
+            shuTb.setNodeName('utl_ %s_B' % name)
+            
+        else:
+            #print 'False'
+            ng.removeNode(node)
+    
+    ng.removeNode(each)
+
+print 'SelectedNodesTo Process =', len(selectedNodeList) 
+
