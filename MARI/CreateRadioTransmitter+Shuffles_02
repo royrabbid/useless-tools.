@@ -1,0 +1,71 @@
+geo = mari.geo.current()
+ng = geo.nodeGraph()
+selectedNodeList = ng.selectedNodeList()
+keep = []
+for each in selectedNodeList:
+    name = each.name()
+    #print name 
+    selectedNodeListUp = ng.getUpstreamNodes(each)
+    #print selectedNodeList 
+
+    for node in selectedNodeListUp:
+        #print node.name()
+        if 'Paint' in node.name():
+            print 'True'
+            keep.append(node)
+            node.setNodeName(name)
+            #FirstDot
+            dot01 = ng.createNode("Misc/Dot")
+            dot01.setInputNode("Input", node)
+            #Transmission01
+            radioT = ng.createNode("Misc/Extension Pack/Radio Transmitter")
+            radioT.setInputNode("Input",dot01)
+            radioT.setNodeName('utl_ %s' % name)
+            #dot02
+            dot02 = ng.createNode("Misc/Dot")
+            dot02.setInputNode("Input", dot01)
+            #ShuffleR
+            shuR= ng.createNode("Filter/Shuffle")
+            shuR.setInputNode("Input",dot02)
+            shuR.setNodeName("shuffle_R")
+            shuR.setMetadata("CompR","r" )
+            shuR.setMetadata("CompG","r" )
+            shuR.setMetadata("CompB","r" )
+            shuT = ng.createNode("Misc/Extension Pack/Radio Transmitter")            
+            shuT.setInputNode("Input", shuR)
+            shuT.setNodeName('utl_ %s_R' % name)            
+            #dot03
+            dot03 = ng.createNode("Misc/Dot")
+            dot03.setInputNode("Input", dot02)
+            #ShuffleG
+            shuG= ng.createNode("Filter/Shuffle")
+            shuG.setInputNode("Input",dot03)
+            shuG.setNodeName("shuffle_G")
+            shuG.setMetadata("CompR","g" )
+            shuG.setMetadata("CompG","g" )
+            shuG.setMetadata("CompB","g" )
+            shuTg = ng.createNode("Misc/Extension Pack/Radio Transmitter")            
+            shuTg.setInputNode("Input", shuG)
+            shuTg.setNodeName('utl_ %s_G' % name)
+            #dot04
+            dot04 = ng.createNode("Misc/Dot")
+            dot04.setInputNode("Input", dot03)
+            #ShuffleB
+            shuB= ng.createNode("Filter/Shuffle")
+            shuB.setInputNode("Input",dot04)
+            shuB.setNodeName("shuffle_B")
+            shuB.setMetadata("CompR","b" )
+            shuB.setMetadata("CompG","b" )
+            shuB.setMetadata("CompB","b" )
+            shuTb = ng.createNode("Misc/Extension Pack/Radio Transmitter")            
+            shuTb.setInputNode("Input", shuB)
+            shuTb.setNodeName('utl_ %s_B' % name)
+            
+        else:
+            #print 'False'
+            ng.removeNode(node)
+    
+    ng.removeNode(each)
+
+print 'SelectedNodesTo Process =', len(selectedNodeList) 
+
