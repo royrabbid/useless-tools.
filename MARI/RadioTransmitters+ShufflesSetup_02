@@ -10,7 +10,7 @@ for each in selectedNodeList:
 
     for node in selectedNodeListUp:
         #print node.name()
-        if 'Paint' in node.name():
+        if 'paint' in node.name():
             print 'True'
             keep.append(node)
             node.setNodeName(name)
