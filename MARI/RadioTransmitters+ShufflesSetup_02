@@ -1,18 +1,13 @@
 geo = mari.geo.current()
 ng = geo.nodeGraph()
 selectedNodeList = ng.selectedNodeList()
-keep = []
 for each in selectedNodeList:
     name = each.name()
     #print name 
     selectedNodeListUp = ng.getUpstreamNodes(each)
     #print selectedNodeList 
-
     for node in selectedNodeListUp:
-        #print node.name()
         if 'paint' in node.name():
-            print 'True'
-            keep.append(node)
             node.setNodeName(name)
             #FirstDot
             dot01 = ng.createNode("Misc/Dot")
@@ -59,13 +54,9 @@ for each in selectedNodeList:
             shuB.setMetadata("CompB","b" )
             shuTb = ng.createNode("Misc/Extension Pack/Radio Transmitter")            
             shuTb.setInputNode("Input", shuB)
-            shuTb.setNodeName('ext_ %s_B' % name)
-            
+            shuTb.setNodeName('ext_ %s_B' % name)            
         else:
-            #print 'False'
-            ng.removeNode(node)
-    
+            ng.removeNode(node)    
     ng.removeNode(each)
-
 print 'SelectedNodesTo Process =', len(selectedNodeList) 
 
