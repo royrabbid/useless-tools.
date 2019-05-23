@@ -20,7 +20,7 @@ for each in selectedNodeList:
             #Transmission01
             radioT = ng.createNode("Misc/Extension Pack/Radio Transmitter")
             radioT.setInputNode("Input",dot01)
-            radioT.setNodeName('utl_ %s' % name)
+            radioT.setNodeName('ext_ %s' % name)
             #dot02
             dot02 = ng.createNode("Misc/Dot")
             dot02.setInputNode("Input", dot01)
@@ -33,7 +33,7 @@ for each in selectedNodeList:
             shuR.setMetadata("CompB","r" )
             shuT = ng.createNode("Misc/Extension Pack/Radio Transmitter")            
             shuT.setInputNode("Input", shuR)
-            shuT.setNodeName('utl_ %s_R' % name)            
+            shuT.setNodeName('ext_ %s_R' % name)            
             #dot03
             dot03 = ng.createNode("Misc/Dot")
             dot03.setInputNode("Input", dot02)
@@ -46,7 +46,7 @@ for each in selectedNodeList:
             shuG.setMetadata("CompB","g" )
             shuTg = ng.createNode("Misc/Extension Pack/Radio Transmitter")            
             shuTg.setInputNode("Input", shuG)
-            shuTg.setNodeName('utl_ %s_G' % name)
+            shuTg.setNodeName('exr_ %s_G' % name)
             #dot04
             dot04 = ng.createNode("Misc/Dot")
             dot04.setInputNode("Input", dot03)
@@ -59,7 +59,7 @@ for each in selectedNodeList:
             shuB.setMetadata("CompB","b" )
             shuTb = ng.createNode("Misc/Extension Pack/Radio Transmitter")            
             shuTb.setInputNode("Input", shuB)
-            shuTb.setNodeName('utl_ %s_B' % name)
+            shuTb.setNodeName('ext_ %s_B' % name)
             
         else:
             #print 'False'
