@@ -1,0 +1,158 @@
+#_V01
+import pymel.core as pm
+import maya.cmds as mc
+import os
+import maya.mel as mel
+from mtoa.cmds.arnoldRender import arnoldRender
+import mtoa.core as core
+from mtoa.core import createStandIn, createVolume
+from mtoa.ui.ae.aiStandInTemplate import LoadStandInButtonPush
+import mtoa.utils as mutils
+import mtoa.lightManager
+import arnold as ai
+import pymel.versions as versions
+import mtoa.convertShaders
+from uuid import getnode as get_mac
+import os
+import shutil
+import sys
+
+####-----------Interface--------------------------######
+ren = 0
+def win():
+    global newNameUI
+    global ren
+    ren = mc.window( t='HDR/Macbeth creator_v01', mnb = False, mxb = False, wh=(500,200), sizeable = False)
+    mc.columnLayout(adj=True, cal="center")
+    mc.separator (h= 10)
+    mc.button(l="Set Mac Beth Chart", command='goMacbeth()')
+    mc.separator (h= 10)
+    mc.button(label="Remove reflection and render settings",command = 'setRenderStandSettings()')
+    mc.separator (h= 10)
+    mc.button(label="Create HDRI",command = 'setHdri()')
+    mc.separator (h= 10)
+    mc.button(label="Close",command = 'closeWin()')
+    mc.separator (h= 10)
+    mc.showWindow(ren)
+
+def launchW():
+    if mc.window( ren, exists = True ):
+        mc.deleteUI(ren)
+        win()
+    else:
+        win()
+        
+def closeWin():
+    print 'Cancelling Cat of the Plan'
+    cmds.deleteUI(ren)
+           
+#---------------------  PROCESSES -------------------------------#
+
+def cameraCheck():
+    global cameraName
+    cameraName = 'renderCam01'
+    cameraSel = mc.ls(sl = True)
+    objAmount = len(cameraSel)
+    shapeNode = mc.listRelatives( cameraSel, shapes=True)
+    
+    if objAmount == (0):
+        raise Exception("Nothing Selected Old Woman!!!!")
+    if objAmount > (1):
+        raise Exception("Please select ONE camera!!!!")     
+    if mc.nodeType(shapeNode) != "camera":           
+        raise Exception("Please select a just camera!!!!")          
+    else:        
+        if cameraName in cameraSel:
+            print 'Cool name for a Camera..matte!!!'        
+        else:
+            mc.select(cameraSel[0])
+            global finalCam
+            sl = mc.rename (cameraName)            
+            mc.setAttr("frontShape.renderable", False)
+            mc.setAttr("perspShape.renderable", False)
+            mc.setAttr("sideShape.renderable", False)
+            mc.setAttr("topShape.renderable", False)
+            mc.setAttr('%s.renderable' %cameraName, True)
+            mc.camera (sl, e = True, displayResolution = True, displayGateMask = True, overscan = 2)
+            print 'Camera Section Done'                                  
+               
+def doCreateMacbeth():
+    node = createStandIn()
+    LoadStandInButtonPush(node.name())
+    mc.select( node[:-5] , r=True) 
+    global stnd               
+    stnd = mc.rename ('Macbeth_standIn')
+    mc.select(stnd , r=True)
+    mc.xform (stnd , cp = True)#centers pivot
+    mc.parent(stnd,cameraName, r = True)
+    mc.scale(0.25, 0.25, 0.25, stnd,r = True)
+    mc.setAttr ( stnd + '.translateZ' ,-.622)
+    mc.setAttr ( stnd + '.translateY' ,-.359)
+    mc.setAttr ( stnd + '.translateX' ,-.376)
+    
+            
+def setRenderStandSettings():
+    mc.setAttr (stnd +'Shape.mode', 6)
+    mc.setAttr (stnd +'Shape.castsShadows' , 0 )
+    mc.setAttr (stnd +'Shape.motionBlur', 0 )
+    mc.setAttr (stnd +'Shape.aiVisibleInDiffuseReflection' , 0 )
+    mc.setAttr (stnd +'Shape.aiVisibleInSpecularReflection', 0 )
+    mc.setAttr (stnd +'Shape.aiVisibleInDiffuseTransmission', 0 )
+    mc.setAttr (stnd +'Shape.aiVisibleInSpecularTransmission', 0 )
+    mc.setAttr (stnd +'Shape.aiVisibleInVolume', 0)
+    print 'renderSetting set on Macbeth'
+    return
+
+
+def doCreatePhysicalSky(): 
+    skydome = mutils.createLocator('aiSkyDomeLight', asLight=True)
+    physicalSkyShader = cmds.createNode('aiPhysicalSky')
+    mc.connectAttr(physicalSkyShader+".outColor", skydome[0] + ".color")
+    mc.select(skydome)
+    ibl = mc.rename('HDR_aiSkycDomeLight1')
+    mc.setAttr (ibl+'.resolution', 4000)
+    mc.setAttr(ibl+'.format', 2)
+   
+def createFileTexture():
+    fileLocation =  mc.fileDialog2(cap="locate Hdri",fm=4)
+    fl = fileLocation[-1]
+    tex = pm.shadingNode('file', name='HDRI_file', asTexture=True, isColorManaged=True)
+    pm.shadingNode('place2dTexture', name='HDRI_p2dOne', asUtility=True)
+    p2d = pm.PyNode('HDRI_p2dOne')
+    tex.filterType.set(0)
+    pm.connectAttr(p2d.outUV, tex.uvCoord)
+    pm.connectAttr(p2d.outUvFilterSize, tex.uvFilterSize)
+    pm.connectAttr(p2d.vertexCameraOne, tex.vertexCameraOne)
+    pm.connectAttr(p2d.vertexUvOne, tex.vertexUvOne)
+    pm.connectAttr(p2d.vertexUvThree, tex.vertexUvThree)
+    pm.connectAttr(p2d.vertexUvTwo, tex.vertexUvTwo)
+    pm.connectAttr(p2d.coverage, tex.coverage)
+    pm.connectAttr(p2d.mirrorU, tex.mirrorU)
+    pm.connectAttr(p2d.mirrorV, tex.mirrorV)
+    pm.connectAttr(p2d.noiseUV, tex.noiseUV)
+    pm.connectAttr(p2d.offset, tex.offset)
+    pm.connectAttr(p2d.repeatUV, tex.repeatUV)
+    pm.connectAttr(p2d.rotateFrame, tex.rotateFrame)
+    pm.connectAttr(p2d.rotateUV, tex.rotateUV)
+    pm.connectAttr(p2d.stagger, tex.stagger)
+    pm.connectAttr(p2d.translateFrame, tex.translateFrame)
+    pm.connectAttr(p2d.wrapU, tex.wrapU)
+    pm.connectAttr(p2d.wrapV, tex.wrapV)
+    mc.setAttr('HDRI_file.fileTextureName',fl, type = 'string')
+    return tex
+    
+def doConnect():    
+    mc.connectAttr( 'HDRI_file.outColor', 'HDR_aiSkycDomeLight1.color', f = True)
+#-------------- INTERFACE COMMANDS --------------------------------------#    
+def setHdri():
+    doCreatePhysicalSky()
+    createFileTexture()
+    doConnect()
+    
+
+def goMacbeth():
+    cameraCheck()
+    doCreateMacbeth()  
+    
+
+launchW()
