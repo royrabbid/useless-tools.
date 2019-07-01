@@ -11,7 +11,7 @@ for i in selection:
         print "no es mesh"
 # Sets the pivot to bottom, Moves geo to center of the world, Deletes history and Freezes transformations
 for n in meshes:
-    bbox = cmds.exactWorldBoundingBox(n)
+    bbox = mc.exactWorldBoundingBox(n)
     bottom = [(bbox[0] + bbox[3])/2, bbox[1], (bbox[2] + bbox[5])/2]
     mc.xform(n, piv=bottom, ws=True)
     mc.move(0,0,0, n, rotatePivotRelative = True)
