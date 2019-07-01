@@ -1,10 +1,10 @@
-import maya.cmds as cmds
+import maya.cmds as mc
 # Gets the meshes from selection.
-selection = cmds.ls(sl=True)
+selection = mc.ls(sl=True)
 meshes = []           
 for i in selection:
-    shapeNode = cmds.listRelatives( i, shapes=True)
-    if cmds.nodeType(shapeNode) == "mesh":
+    shapeNode = mc.listRelatives( i, shapes=True)
+    if mc.nodeType(shapeNode) == "mesh":
         meshes.append(i)
         print "es mesh"
     else:
@@ -13,7 +13,7 @@ for i in selection:
 for n in meshes:
     bbox = cmds.exactWorldBoundingBox(n)
     bottom = [(bbox[0] + bbox[3])/2, bbox[1], (bbox[2] + bbox[5])/2]
-    cmds.xform(n, piv=bottom, ws=True)
-    cmds.move(0,0,0, n, rotatePivotRelative = True)
-    cmds.makeIdentity (apply = True, t = 1, r = 1,  s = 1, n = 0, pn = 1)
-cmds.DeleteHistory (ch=True) 
+    mc.xform(n, piv=bottom, ws=True)
+    mc.move(0,0,0, n, rotatePivotRelative = True)
+    mc.makeIdentity (apply = True, t = 1, r = 1,  s = 1, n = 0, pn = 1)
+mc.delete (ch=True) 
