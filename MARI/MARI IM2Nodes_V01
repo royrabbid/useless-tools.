@@ -1,0 +1,142 @@
+##################################################################################################
+#V_1.0               Prints wich nodes are using selected images in Image Manager.               #
+##################################################################################################
+sel = mari.images.selected()
+print sel
+
+geos = mari.geo.list()
+pathsSelected = []
+uAmount = []
+
+for i in sel:
+    p = i.filePath()
+    sp = str(p.split('/')[-1])
+    pathsSelected.append(sp)
+
+print 'pathSelected',pathsSelected
+for g in geos:
+    mari.geo.setCurrent(g) #sets as current
+    print '-'*30
+    print 'in Geo:', mari.geo.current().name()
+    mygeo = mari.current.geo()
+    nodegraph = mygeo.nodeGraph()
+    nodes = nodegraph.nodeList()
+    for node in nodes:
+        type = node.typeID()
+        if 'JK_Axis_Projection_V2' in type:
+            nm = (node.metadata('Image').split('/'))[-1]
+            if nm in pathsSelected:
+                print 'node:',str(node.nodeName()).upper(),'uses,', 'Texture'
+                uAmount.append(nm)
+
+        elif 'MRI_Environment_Tri_Planar_Projection' in type:
+            tpF = (node.metadata('frontImage').split('/'))[-1]  
+            tpT = (node.metadata('topImage').split('/'))[-1]
+            tpR = node.metadata('rightImage').split('/')[-1]
+            if tpF in pathsSelected:
+                print 'node:',str(node.nodeName()).upper(),'uses,',tpF, 'Texture in Front Slot'
+                uAmount.append(tpF)
+            if tpT in pathsSelected:
+                print 'node:',str(node.nodeName()).upper(),'uses,',tpT, 'Texture in Top Slot'
+                uAmount.append(tpF)
+            if tpR in pathsSelected:
+                print 'node:',str(node.nodeName()).upper(),'uses,',tpR, 'Texture in Right Slot'
+                uAmount.append(tpF)
+
+
+        elif 'wtFlowTriplanar' in type:
+            flFRO = (node.metadata('frontImage')).split('/')[-1]  
+            flTOP = (node.metadata('topImage')).split('/')[-1]   
+            flRI = (node.metadata('rightImage')).split('/')[-1]
+            if flFRO in pathsSelected:
+                print 'node:',str(node.nodeName()).upper(),'uses,',flFRO, 'Texture in FrontImage slot'
+                uAmount.append(flFRO)
+            if flTOP in pathsSelected:
+                print 'node:',str(node.nodeName()).upper(),'uses,',flTOP, 'Texture in TopImage slot'
+                uAmount.append(flTOP)
+            if flRI in pathsSelected:
+                print 'node:',str(node.nodeName()).upper(),'uses,',flRI, 'Texture in RightImage slot'
+                uAmount.append(flRI)
+
+
+        elif 'MRI_Procedural_Pattern_Tiled' in type:
+            nmPPT = (node.metadata('TileImage')).split('/')[-1]
+            if nmPPT in pathsSelected:
+                print 'node:',str(node.nodeName()).upper(),'uses,',nmPPT, 'Texture'
+                uAmount.append(nmPPT)
+
+        elif 'wtTriplanarProjection' in type:
+            nm03 = (node.metadata('Image')).split('/')[-1]
+            if nm03 in pathsSelected:
+                print 'node:',str(node.nodeName()).upper(),'uses,',nm03, 'Textures'  
+                uAmount.append(nm03)
+ 
+        elif 'JK_Texture_Scatter_3DX1' in type:
+            nm = node.metadata('MapA').split('/')[-1]
+            if nm in pathsSelected:
+                print 'node:',str(node.nodeName()).upper(),'uses,',nm, 'Textures'
+                uAmount.append(nm)
+
+        elif 'MRI_Environment_Sphere_Map_Projector' in type:
+            nm = node.metadata('SphericalImage').split('/')[-1]
+            if nm in pathsSelected:
+                print 'node:',str(node.nodeName()).upper(),'uses,',nm, 'Textures'
+                uAmount.append(nm)
+                
+        elif 'Cylindrical Projection' in type:
+           nm = node.metadata('Map')
+           if nm in pathsSelected:
+                print 'node:',str(node.nodeName()).upper(),'uses,',nm, 'Textures'    
+                uAmount.append(nm)
+        elif 'Texture Scatter UV' in type:
+            nmA = node.metadata('MapA').split('/')[-1]
+            nmB = node.metadata('MapB').split('/')[-1]
+            nmC = node.metadata('MapC').split('/')[-1]
+            nmD = node.metadata('MapD').split('/')[-1]
+            if nmA in pathsSelected:
+                print 'node:',str(node.nodeName()).upper(),'uses,',nmA, 'Texture in MapA slot'
+                uAmount.append(nmA)             
+            if nmB in pathsSelected:
+                print 'node:',str(node.nodeName()).upper(),'uses,',nmB, 'Texture in MapB slot'
+                uAmount.append(nmB)             
+            if nmC in pathsSelected:
+                print 'node:',str(node.nodeName()).upper(),'uses,',nmC, 'Texture in MapC slot'
+                uAmount.append(nmC)
+            if nmD in pathsSelected:
+                print 'node:',str(node.nodeName()).upper(),'uses,',nmD, 'Texture in MapA slot'
+                uAmount.append(nmD)             
+
+        elif 'JK_AxisProjectionArrayX6_V2' in type:
+            nmA = node.metadata('ImageA').split('/')[-1]
+            nmB = node.metadata('ImageB').split('/')[-1]
+            nmC = node.metadata('ImageC').split('/')[-1]
+            nmD = node.metadata('ImageD').split('/')[-1]
+            nmE = node.metadata('ImageE').split('/')[-1]
+            nmF = node.metadata('ImageF').split('/')[-1]
+            if nmA in pathsSelected:
+                print 'node:',str(node.nodeName()).upper(),'uses,',nmA, 'Texture in MapA slot'
+                uAmount.append(nmA)             
+            if nmB in pathsSelected:
+                print 'node:',str(node.nodeName()).upper(),'uses,',nmB, 'Texture in MapB slot'
+                uAmount.append(nmB)             
+            if nmC in pathsSelected:
+                print 'node:',str(node.nodeName()).upper(),'uses,',nmC, 'Texture in MapC slot'
+                uAmount.append(nmC)
+            if nmD in pathsSelected:
+                print 'node:',str(node.nodeName()).upper(),'uses,',nmD, 'Texture in MapA slot'
+                uAmount.append(nmD) 
+            if nmE in pathsSelected:
+                print 'node:',str(node.nodeName()).upper(),'uses,',nmE, 'Texture in MapA slot'
+                uAmount.append(nmE)
+            if nmF in pathsSelected:
+                print 'node:',str(node.nodeName()).upper(),'uses,',nmF, 'Texture in MapA slot'
+                uAmount.append(nmF) 
+
+        elif 'MRI_Environment_Sphere_Map' in type:
+            nm = node.metadata('SphereMap').split('/')
+            if nm in pathsSelected:
+                print 'node:',str(node.nodeName()).upper(),'uses,',nm, 'Texture in MapA slot'
+                uAmount.append(nm) 
+                                                 
+print '-'*30            
+print 'Amount of Nodes using Selected Images:',len(uAmount)  
