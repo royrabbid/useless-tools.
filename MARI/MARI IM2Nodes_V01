@@ -125,13 +125,13 @@ for g in geos:
                 print 'node:',str(node.nodeName()).upper(),'uses,',nmC, 'Texture in MapC slot'
                 uAmount.append(nmC)
             if nmD in pathsSelected:
-                print 'node:',str(node.nodeName()).upper(),'uses,',nmD, 'Texture in MapA slot'
+                print 'node:',str(node.nodeName()).upper(),'uses,',nmD, 'Texture in MapD slot'
                 uAmount.append(nmD) 
             if nmE in pathsSelected:
-                print 'node:',str(node.nodeName()).upper(),'uses,',nmE, 'Texture in MapA slot'
+                print 'node:',str(node.nodeName()).upper(),'uses,',nmE, 'Texture in MapE slot'
                 uAmount.append(nmE)
             if nmF in pathsSelected:
-                print 'node:',str(node.nodeName()).upper(),'uses,',nmF, 'Texture in MapA slot'
+                print 'node:',str(node.nodeName()).upper(),'uses,',nmF, 'Texture in MapF slot'
                 uAmount.append(nmF) 
         elif 'MRI_Environment_Sphere_Map' in type:
             Enm = node.metadata('SphereMap').split('/')[-1]
@@ -142,3 +142,8 @@ for g in geos:
 print '-'*30            
 print 'Amount of Nodes using Selected Images:',len(uAmount)             
             
+            
+     
+
+
+    
