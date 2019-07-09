@@ -1,0 +1,245 @@
+print '##############################################'
+geos = mari.geo.list()
+sel = mari.images.selected()
+usedImages = []
+imageManager = mari.images.list()
+toKeep = []
+temp = set()
+managerIL = []
+#User Selected to keep
+for i in sel:
+  p = i.filePath()
+  sp = str(p.split('/')[-1])
+  usedImages.append(sp)
+  
+#Processing the node graph
+for g in geos:
+    mari.geo.setCurrent(g) #sets as current
+    print '-'*30
+    print 'Geo Analysed:', mari.geo.current().name()
+    mygeo = mari.current.geo()
+    nodegraph = mygeo.nodeGraph()
+    nodes = nodegraph.nodeList()
+    for node in nodes:
+        type = node.typeID()
+        if 'JK_Axis_Projection_V2' in type:
+            print '-'*30 
+            print 'JK_Axis_Projection_V2:', node.nodeName()
+            mt = node.metadataNames()
+            nm = node.metadata('Image')
+            imag01 = nm.split('/')[-1]
+            usedImages.append(imag01)
+            print 'Tiled:',imag01 
+            print '-'*30                       
+
+        elif 'MRI_Environment_Tri_Planar_Projection' in type:
+            print '-'*30 
+            print 'MRI_Environment_Tri_Planar_Projection:', node.nodeName()
+            mt = node.metadataNames()
+            nmF = node.metadata('frontImage')
+            imag01 = nmF.split('/')[-1]
+            usedImages.append(imag01)
+            print 'Triplanar Front:', imag01    
+            nmT = node.metadata('topImage')
+            imag02 = nmT.split('/')[-1]
+            usedImages.append(imag02)
+            print 'Triplanar Top:', imag02 
+            nmR = node.metadata('rightImage')
+            imag03 = nmR.split('/')[-1]
+            usedImages.append(imag03)
+            print 'Triplanar right:', imag03
+            print '-'*30
+
+        elif 'wtFlowTriplanar' in type:
+            print '-'*30 
+            print 'wtFlowTriplanar:', node.nodeName()
+            mt = node.metadataNames()
+            nmWFTF = node.metadata('frontImage')
+            imag01 = nmWFTF.split('/')[-1]
+            usedImages.append(imag01)
+            print'Front:', imag01          
+            nmT = node.metadata('topImage')
+            imag02 = nmT.split('/')[-1]
+            usedImages.append(imag02)
+            print 'Top:', imag02          
+            nmR = node.metadata('rightImage')
+            imag03 = nmR.split('/')[-1]
+            usedImages.append(imag03)
+            print 'Right:', imag03  
+            print '-'*30                 
+
+        elif 'MRI_Procedural_Pattern_Tiled' in type:
+            print '-'*30 
+            print 'MRI_Procedural_Pattern_Tiled:', node.nodeName()
+            mt = node.metadataNames()
+            nmPPT = node.metadata('TileImage')
+            imag01 = nmPPT.split('/')[-1]
+            usedImages.append(imag01)
+            print 'Tiled:', imag01 
+            print '-'*30                   
+
+        elif 'wtTriplanarProjection' in type:
+            print '-'*30 
+            print 'wtTriplanarProjection:', node.nodeName()
+            mt = node.metadataNames()
+            nm = node.metadata('Image')
+            imag01 = nm.split('/')[-1]
+            usedImages.append(imag01)
+            print 'Tiled:',imag01
+            print '-'*30 
+
+        elif 'JK_Texture_Scatter_3DX1' in type:
+            print '-'*30 
+            print 'JK_Texture_Scatter_3DX1 Scatter:', node.nodeName()
+            mt = node.metadataNames()
+            nm = node.metadata('MapA')
+            imag01 = nm.split('/')[-1]
+            usedImages.append(imag01)
+            print 'Scattered:',imag01 
+            print '-'*30
+
+        elif 'MRI_Environment_Sphere_Map_Projector' in type:
+            print '-'*30 
+            print 'MRI_Environment_Sphere_Map_Projector:', node.nodeName()
+            mt = node.metadataNames()
+            nm = node.metadata('SphericalImage')
+            imag01 = nm.split('/')[-1]
+            usedImages.append(imag01)
+            print 'sphericalImage:', imag01 
+            print '-'*30
+
+        elif 'Cylindrical Projection' in type:
+            print '-'*30
+            print 'Cylindrical Projection:', node.nodeName() 
+            mt = node.metadataNames()
+            nm = node.metadata('Map')
+            imag01 = nm.split('/')[-1]
+            usedImages.append(imag01)
+            print 'CylindricalImage:', imag01 
+            print '-'*30
+
+        elif 'Texture Scatter UV' in type:
+            print '-'*30 
+            print 'Texture Scatter UV:', node.nodeName()
+            mt = node.metadataNames()
+            nmA = node.metadata('MapA')
+            imag01 = nmA.split('/')[-1]
+            usedImages.append(imag01)
+            print 'MapA:', imag01 
+            mt = node.metadataNames()
+            nmB = node.metadata('MapB')
+            imag02 = nmB.split('/')[-1]
+            usedImages.append(imag02)
+            print 'MapB:', imag02 
+            mt = node.metadataNames()
+            nmC = node.metadata('MapC')
+            imag03 = nmC.split('/')[-1]
+            usedImages.append(imag03)
+            print 'MapC:', imag03 
+            mt = node.metadataNames()
+            nmD = node.metadata('MapD')
+            imag04 = nmD.split('/')[-1]
+            usedImages.append(imag04)
+            print 'MapD:', imag04
+            print '-'*30
+
+        elif 'JK_Texture_Scatter_UVX1' in type:
+            print '-'*30 
+            print 'JK_Texture_Scatter_UVX1:', node.nodeName()
+            mt = node.metadataNames()
+            nmA = node.metadata('MapA')
+            imag01 = nmA.split('/')[-1]
+            usedImages.append(imag01)
+            print 'MapA:', imag01 
+            print '-'*30 
+
+        elif 'JK_AxisProjectionArrayX6_V2' in type:
+            print '-'*30 
+            print 'JK_AxisProjectionArrayX6_V2:', node.nodeName()
+            mt = node.metadataNames()
+            nmA = node.metadata('ImageA')
+            imag01 = nmA.split('/')[-1]
+            usedImages.append(imag01)
+            print 'ImageA:', imag01 
+            mt = node.metadataNames()
+            nmB = node.metadata('ImageB')
+            imag02 = nmB.split('/')[-1]
+            usedImages.append(imag02)
+            print 'ImageB:', imag02 
+            mt = node.metadataNames()
+            nmC = node.metadata('ImageC')
+            imag03 = nmC.split('/')[-1]
+            usedImages.append(imag03)
+            print 'ImageC:', imag03 
+            mt = node.metadataNames()
+            nmD = node.metadata('ImageD')
+            imag04 = nmD.split('/')[-1]
+            usedImages.append(imag04)
+            print 'ImageD:', imag04
+            mt = node.metadataNames()
+            nmE = node.metadata('ImageE')
+            imag05 = nmE.split('/')[-1]
+            usedImages.append(imag05)
+            print 'ImageE:', imag05
+            mt = node.metadataNames()
+            nmF = node.metadata('ImageF')
+            imag06 = nmF.split('/')[-1]
+            usedImages.append(imag06)
+            print 'ImageF:', imag06
+            print '-'*30
+
+        elif 'MRI_Environment_Sphere_Map' in type:
+            print '-'*30 
+            print 'MRI_Environment_Sphere_Map', node.nodeName()
+            mt = node.metadataNames()
+            nm = node.metadata('SphereMap')
+            imag01 = nm.split('/')[-1]
+            usedImages.append(imag01)
+            print 'Projected Image',imag01 
+            print '-'*30 
+
+        else:
+            print  node.nodeName()+':'+ type +', Doesnt Match the criteria'
+#            print "doesn't match"
+
+print 'Used Images in Scene:', usedImages, len(usedImages)
+print '##############################################'
+
+#Processing the image managger content
+print '#'*30
+print '----------------------Image Manager Files------------------------------'
+for i in imageManager:
+    sep = (i.filePath())
+    #print (sep)
+    sep01 = sep.split('/')
+    #print (sep01)
+    name = sep01[-1]
+    print'FromImageManeger:',(name)
+    managerIL.append(name)
+print '################################################'
+print 'cantidad en image manager', len(managerIL)
+print 'Used Images in Scene:', usedImages, len(usedImages)
+
+#Removing Duplicates from images list
+for val in usedImages:
+    if not val in temp:
+        toKeep.append(val)
+        temp.add(val)
+        
+        
+print '#'*30
+print 'FinalUsedImageList',toKeep, len(toKeep)
+print '#'*30
+#print 'imageManager Images',managerIL, len(managerIL)
+
+#Removing the files from image manager
+for o in imageManager:
+    if ((o.filePath()).split('/')[-1]) not in toKeep:
+        print 'Removing', ((o.filePath()).split('/')[-1])
+        mari.images.remove(o)       
+        
+    else:
+        print 'Keeping', ((o.filePath()).split('/')[-1])
+        
+        
+   
