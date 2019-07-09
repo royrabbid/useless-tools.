@@ -2,8 +2,7 @@
 #V_1.0               Prints wich nodes are using selected images in Image Manager.               #
 ##################################################################################################
 sel = mari.images.selected()
-print sel
-
+#print sel
 geos = mari.geo.list()
 pathsSelected = []
 uAmount = []
@@ -43,7 +42,6 @@ for g in geos:
                 print 'node:',str(node.nodeName()).upper(),'uses,',tpR, 'Texture in Right Slot'
                 uAmount.append(tpF)
 
-
         elif 'wtFlowTriplanar' in type:
             flFRO = (node.metadata('frontImage')).split('/')[-1]  
             flTOP = (node.metadata('topImage')).split('/')[-1]   
@@ -57,7 +55,6 @@ for g in geos:
             if flRI in pathsSelected:
                 print 'node:',str(node.nodeName()).upper(),'uses,',flRI, 'Texture in RightImage slot'
                 uAmount.append(flRI)
-
 
         elif 'MRI_Procedural_Pattern_Tiled' in type:
             nmPPT = (node.metadata('TileImage')).split('/')[-1]
@@ -84,9 +81,9 @@ for g in geos:
                 uAmount.append(nm)
                 
         elif 'Cylindrical Projection' in type:
-           nm = node.metadata('Map')
+           nm = (node.metadata('Map').split('/'))[-01]
            if nm in pathsSelected:
-                print 'node:',str(node.nodeName()).upper(),'uses,',nm, 'Textures'    
+                print 'node:',str(node.nodeName()).upper(),'uses,',nm, 'Texture in Texture Map Slot'    
                 uAmount.append(nm)
         elif 'Texture Scatter UV' in type:
             nmA = node.metadata('MapA').split('/')[-1]
@@ -105,6 +102,11 @@ for g in geos:
             if nmD in pathsSelected:
                 print 'node:',str(node.nodeName()).upper(),'uses,',nmD, 'Texture in MapA slot'
                 uAmount.append(nmD)             
+        elif 'JK_Texture_Scatter_UVX1' in type:
+               nmA = node.metadata('MapA').split('/')[-1]
+               if nmA in pathsSelected:
+                print 'node:',str(node.nodeName()).upper(),'uses,',nmA, 'Texture in Map slot'
+                uAmount.append(nmA)               
 
         elif 'JK_AxisProjectionArrayX6_V2' in type:
             nmA = node.metadata('ImageA').split('/')[-1]
@@ -131,12 +133,12 @@ for g in geos:
             if nmF in pathsSelected:
                 print 'node:',str(node.nodeName()).upper(),'uses,',nmF, 'Texture in MapA slot'
                 uAmount.append(nmF) 
-
         elif 'MRI_Environment_Sphere_Map' in type:
-            nm = node.metadata('SphereMap').split('/')
-            if nm in pathsSelected:
-                print 'node:',str(node.nodeName()).upper(),'uses,',nm, 'Texture in MapA slot'
+            Enm = node.metadata('SphereMap').split('/')[-1]
+            if Enm in pathsSelected:
+                print 'node:',str(node.nodeName()).upper(),'uses,',Enm, 'Texture in SphereMap slot'
                 uAmount.append(nm) 
                                                  
 print '-'*30            
-print 'Amount of Nodes using Selected Images:',len(uAmount)  
+print 'Amount of Nodes using Selected Images:',len(uAmount)             
+            
