@@ -1,0 +1,58 @@
+#JUST SELECT THE CHANNEL
+geo = mari.geo.current()
+ng = geo.nodeGraph()
+selectedNodeList = ng.selectedNodeList()
+for each in selectedNodeList:
+    name = each.name() 
+    selectedNodeListUp = ng.getUpstreamNodes(each) 
+    for node in selectedNodeListUp:
+        node.setSelected(False)
+        print node.nodeName(),',' ,node.typeID()
+        if node.typeID() == 'MRI_Misc_Channel_Input':
+            #node.setNodeName(name)
+            #Transmission01
+            radioT = ng.createNode("Misc/Extension Pack/Radio Transmitter")
+            radioT.setInputNode("Input",node)
+            radioT.setNodeName('utl_ %s' % name)
+            radioT.setSelected(True)
+            #ShuffleR
+            shuR= ng.createNode("Filter/Shuffle")
+            shuR.setInputNode("Input",node)
+            shuR.setNodeName("shuffle_R")
+            shuR.setMetadata("CompR","r" )
+            shuR.setMetadata("CompG","r" )
+            shuR.setMetadata("CompB","r" )
+            shuR.setSelected(True)
+            shuT = ng.createNode("Misc/Extension Pack/Radio Transmitter")            
+            shuT.setInputNode("Input", shuR)
+            shuT.setNodeName('ext_ %s_R' % name)
+            shuT.setSelected(True)            
+            #ShuffleG
+            shuG= ng.createNode("Filter/Shuffle")
+            shuG.setInputNode("Input",node)
+            shuG.setNodeName("shuffle_G")
+            shuG.setMetadata("CompR","g" )
+            shuG.setMetadata("CompG","g" )
+            shuG.setMetadata("CompB","g" )
+            shuG.setSelected(True)
+            shuTg = ng.createNode("Misc/Extension Pack/Radio Transmitter")            
+            shuTg.setInputNode("Input", shuG)
+            shuTg.setNodeName('ext_ %s_G' % name)
+            shuTg.setSelected(True)
+            #ShuffleB
+            shuB= ng.createNode("Filter/Shuffle")
+            shuB.setInputNode("Input",node)
+            shuB.setNodeName("shuffle_B")
+            shuB.setMetadata("CompR","b" )
+            shuB.setMetadata("CompG","b" )
+            shuB.setMetadata("CompB","b" )
+            shuB.setSelected(True)
+            shuTb = ng.createNode("Misc/Extension Pack/Radio Transmitter")            
+            shuTb.setInputNode("Input", shuB)
+            shuTb.setNodeName('ext_ %s_B' % name)
+            shuTb.setSelected(True)
+              
+              
+        else:
+            ng.removeNode(node)    
+print 'SelectedNodesTo Process =', len(selectedNodeList) 
