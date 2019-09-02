@@ -41,12 +41,14 @@ def goMulti():
         raise Exception('Nothing Selected')   
 
 def getUdim(u,v):
+    # Expects floats(uv positions) and returns absolute int UV values and Udim possition
     uUV = int(math.floor(u))
     vUV = int(math.floor(v))
     udim = 1000 + (uUV + 1) + (vUV*10)
     return uUV,vUV,udim 
         
 def getUV(udim):
+    #Expects int number (udim) and returns int UV possition
     uUV = list(str(udim))
     uUV = int(uUV[-1])
     if uUV == 0:
