@@ -1,0 +1,154 @@
+import maya.cmds as mc
+import pymel.core as pm
+import math
+import maya.mel as mel
+
+#####================INTERFACE=======================
+gMainProgressBar = 0
+ren = 0
+def win():
+    global ren
+    ren = mc.window( t = 'UV STACKER V_01', wh = (500,200), sizeable = False )
+    mc.columnLayout(adjustableColumn = True )
+    mc.separator( h = 10 )
+    mc.button(label = 'Complex Stacker(+ than one tile per geo)', command = 'goMulti()')
+    mc.separator( h = 10 )
+    mc.button(label = 'cancel', command = 'closeWin()')
+    mc.separator( h = 10 )
+    mc.showWindow( ren )
+
+
+def launchW():
+    if mc.window( ren, exists = True):
+        mc.deleteUI(ren)
+        win()
+    else:
+        win()    
+    
+def closeWin():
+    print 'Canceled by user'
+    mc.deleteUI(ren)
+
+#####################################################################################################
+#      MULTI UDIM PER GEO - geos that have multiple UDIM tiles                                      #
+#####################################################################################################
+def goMulti():
+    sel = mc.ls(sl=1)
+    if sel:
+        print 'Starting'
+        multiStacker()        
+    else:
+        raise Exception('Nothing Selected')   
+
+def getUdim(u,v):
+    uUV = int(math.floor(u))
+    vUV = int(math.floor(v))
+    udim = 1000 + (uUV + 1) + (vUV*10)
+    return uUV,vUV,udim 
+        
+def getUV(udim):
+    uUV = list(str(udim))
+    uUV = int(uUV[-1])
+    if uUV == 0:
+        u = 9
+    else:
+        u = int(uUV)-1
+    v = (udim - 1000 - (u + 1))/10
+    return u,v,udim 
+
+#Process
+def multiStacker():
+    sel = mc.ls(sl=1)
+    uvUab = 0
+    uvVab = 0
+    totalUdims = []           
+    for i in sel:#geo level
+    
+
+        print '='*60
+        print 'Processing geo:',i
+        mc.select(i)
+        mc.delete(ch = True)#deletes history
+        uvNum = mc.polyEvaluate(i, uv=1)
+        mc.select(mc.polyListComponentConversion(tuv = True), r = True) #selects uvs
+        #Geo Variables
+        uvSel = (mc.ls(sl = True))[-1]#selects Uvs and keeps the element of the list to process it
+        objName = (uvSel.split('.'))[0]
+        udimList = set()
+    
+        newUdimList = set()
+        uvList = []#list of each uv ID number with it's u and v values. 
+        #UV PROCESSING TO GET UV ID/POSSITION LIST AND AMOUNT OF TILES
+        for uv in range(uvNum): # UV OFFSET uv level
+            mc.select('%s.map[%d]' %(objName, uv))
+            uVal = (mc.polyEditUV( query=True ))[0]
+            vVal = (mc.polyEditUV( query=True ))[1]
+            udimID = getUdim(uVal,vVal)
+            uPos4UV = udimID[0]# gets the position of the selected uv point on U axis
+            vPos4UV = udimID[1]# gets the position of the selected uv point on V axis
+            uvIDandCoord = (uVal,vVal, uv)# makes a list with uv id number and u and v pos in a tuple.
+            uvList.append(uvIDandCoord)
+            currentUdimPos = udimID[2]
+            udimList.add(currentUdimPos)            
+        print 'Udims ocuppied by geo',list(udimList),'(%d)'% len(list(udimList)) 
+
+        sUvList =sorted(uvList)
+        # Change the uv position based on the uvUav and uvVab values and generates a new list with the new possition
+        global gMainProgressBar
+        gMainProgressBar = maya.mel.eval('$tmp = $gMainProgressBar')
+        mc.progressBar(gMainProgressBar, 
+                                    edit = True, 
+                                    beginProgress = True,
+                                    isInterruptable = True,
+                                    status = 'Evaluating Uvs in process...',
+                                    maxValue = len(udimList))
+        for tile in udimList: #Tile level
+            if mc.progressBar(gMainProgressBar, query = True, isCancelled = True ):
+                break
+            mc.progressBar(gMainProgressBar, edit = True, step = 1)
+            for uv in sUvList:
+                uvID = uv[2]
+                coords = uv[0],uv[1]
+                udimID = (getUdim(uv[0],uv[1]))[2]
+                if udimID == tile:
+                    uvList.remove(uv)
+                    mc.select('%s.map[%d]' %(objName, uvID))
+                    uValT = (mc.polyEditUV( query=True ))[0]
+                    vValT = (mc.polyEditUV( query=True ))[1]
+                    ceroUval = uValT - int(math.floor(uValT))
+                    ceroVval = vValT - int(math.floor(vValT))
+                    fUval = ceroUval + uvUab
+                    fVval = ceroVval + uvVab
+                    mc.select('%s.map[%d]' %(objName, uvID))
+                    mc.polyEditUV( relative = False , uValue = fUval, vValue = fVval)               
+                    newU = (mc.polyEditUV( query=True ))[0]
+                    newV = (mc.polyEditUV( query=True ))[1]
+               
+                    newUdim = getUdim(newU,newV)[2] 
+                    newUdimList.add(newUdim)
+
+            uvUab = uvUab + 1
+            if uvUab < 9:
+                uvUab = uvUab
+                uvVab = uvVab
+            if uvUab > 9:
+                uvUab = 0
+                uvVab = uvVab + 1
+    
+                        
+    
+        newUdimList = list(newUdimList)
+        print 'new Udim locations:',list(newUdimList),'(%d)'% len(newUdimList)
+        totalUdims.append(newUdimList)
+        udimAmount = len(udimList)
+        #sNewUdimList = sorted(newUdimList)
+        #firstUdim = sNewUdimList[0]
+        #latestUdim = sNewUdimList[-1]
+        #lastUVpos = getUV(latestUdim)[:2] 
+        #lenNewUdimList = len(newUdimList)
+    mc.progressBar(gMainProgressBar, edit = True, endProgress = True)    
+    mc.select(sel)
+    print '='*60
+    print 'UDIMS USED AFTER OFFSET:', totalUdims,'(%d)'% len(totalUdims)
+    
+launchW()
