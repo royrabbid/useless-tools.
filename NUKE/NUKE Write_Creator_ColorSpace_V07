@@ -1,4 +1,4 @@
-# Nuke Write creator V006
+# Nuke Write creator V007
 import nuke as nk
 class SetWrite(nukescripts.PythonPanel):
     def __init__(self, node):
