@@ -27,7 +27,7 @@ def win():
     mc.separator (h= 10)
     mc.button(l="Set Mac Beth Chart", command='goMacbeth()')
     mc.separator (h= 10)
-    mc.button(label="Remove reflection and render settings",command = 'setRenderStandSettings()')
+    mc.button(label="Set MacBeth render settings",command = 'setRenderStandSettings()')
     mc.separator (h= 10)
     mc.button(label="Create HDRI",command = 'setHdri()')
     mc.separator (h= 10)
@@ -56,7 +56,7 @@ def cameraCheck():
     shapeNode = mc.listRelatives( cameraSel, shapes=True)
     
     if objAmount == (0):
-        raise Exception("Nothing Selected Old Woman!!!!")
+        raise Exception("Please select a camera!!!!")
     if objAmount > (1):
         raise Exception("Please select ONE camera!!!!")     
     if mc.nodeType(shapeNode) != "camera":           
