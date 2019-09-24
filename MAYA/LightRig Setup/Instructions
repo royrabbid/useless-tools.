@@ -1,0 +1,19 @@
+Instalation
+1 - Download the content of the folder named assets and icons.
+2 - Copy the content of the file and paste it into the maya's script editor
+3 - Select all the script by pressing CTRL + A, and with LMB drag into the shelf and choose phyton.
+4 - Finally, right click on the new created button and choose edit. Select Shelve tab and under "icon preview", click the browse button and 
+    select the Mac.png file from the icons folder you previously downloaded.
+    
+    To make it work
+    1- Select the camera you created for rendering and click the button.
+    2- Choose wich HDR you wanto use.
+    3- Click Set MacBeth render settings.(sets the mac beth stand in not to be visible in reflection or refractions on the scene)
+    4- Finally click create HRI.
+    
+    The script will remove the ortographic cameras to be rendereable from the render settings.
+    
+    Enjoy.
+    
+    Any questions?
+    please feel free to write to gr_rodrigo@gmail.com
