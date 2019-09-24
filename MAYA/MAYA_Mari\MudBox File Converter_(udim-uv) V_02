@@ -1,5 +1,8 @@
+# Mari to Mud converter v_2.0
 import maya.cmds as mc
 import os
+import math
+import shutil
 
 
 ####-----------Interface--------------------------######
@@ -32,6 +35,28 @@ def closeWin():
     print 'Cancelling Cat of the Plan'
     cmds.deleteUI(ren)
     
+    
+# Functions
+
+def getUdim(u,v):
+    # Expects ints U and V and returns absolute int UV values and Udim possition
+    udim = 1000 + (u) + ((v-1) * 10)
+    return udim 
+        
+def getUV(udim):
+    #Expects int number (udim) and returns int UV possition
+    uUV = list(str(udim))
+    #print uUV, 'var dentro func' 
+    uUV = int(uUV[-1])
+    if uUV == 0:
+        u = 10
+    else:
+        u = int(uUV)
+        
+    v = ((udim - 1000 - (u - 1))/10)+1
+    #print 'u%d, v%i' % (u,v), 'UDIM = ' , udim
+    return u,v 
+    
 ############################################################################## 
 #           From Mudbox to Mari Mud uses U1_V1 as the first tile             #
 ############################################################################## 
@@ -60,18 +85,20 @@ def MudToMari():
         vStr =v.encode ('ascii', 'ignore')    
         uInt = int(u.replace("u",""))
         vInt = int(v.replace('v',''))
-        newNotation = 1000+(uInt)+((vInt-1)*10)
+        #print '_U%d_V%i' % (uInt, vInt)
+        #newNotation = 1000+(uInt)+((vInt-1)*10)
+        newNotation = getUdim(uInt,vInt)
         newFileName = userFilename+'_'+str(newNotation)+'.'+ext
         finalPath = str(fPath)+'/'+newFileName
         #print finalPath
         try:  
-            os.rename('%s'%f,'%s'%finalPath) 
+            shutil.copy('%s'%f,'%s'%finalPath) 
         except:
             print 'Existing File', finalPath
             raise Exception("Some Files Already exists!!!!")
        
         print 'Converted UV', uStr +'_'+ vStr , 'into UDIM:',newNotation
-    print 'Amount of files processed:', len(folder)
+    print 'Files renamed:', len(folder)
 
     
 ############################################################################## 
@@ -111,24 +138,16 @@ def UDIMtoUV():
         #print mNol, type(mNol)
         udim = int(mNol.encode ('ascii', 'ignore'))
         #print udim, type(udim)
-        udim_string = str(udim)
-        u = int(udim_string [-1])
-        #print u
-        if u == 0:
-            #print 'si es cero'
-            u = u + 10 
-        #print u
-        v = ((udim - 1000 - u)/10)+1
-        #print v
-        u = udim - 1000 - ((v-1)*10)
-        #print u    
-        uv = 'u'+str(u)+'_'+'v'+str(v)
-        print uv, 'UDIM convertion to ', udim 
-        fname = fPath+'/'+userFilename+'_'+uv+'.'+ext
-        #print fname 
+        u = getUV(udim)[0]
+        v = getUV(udim)[1]
+        UVf = '_u%d_v%i' % (u,v)
+        print UVf
+        fname = fPath+'/'+userFilename+UVf+'.'+ext
+        print fname 
     
         try:  
-            os.rename('%s'%f,'%s'%fname) 
+            #os.rename('%s'%f,'%s'%fname)
+            shutil.copy('%s'%f,'%s'%fname)
         except:
             print 'Existing File', fname
             raise Exception("Some Files Already exists!!!!")
