@@ -10,22 +10,22 @@ ren = 0
 def win():
     global newNameUI
     global ren
-    ren = cmds.window( t='Mari/Mudbox file converter V_01', mnb = False, mxb = False, wh=(500,200), sizeable = False)
-    cmds.columnLayout(adj=True, cal="center")
-    cmds.separator (h= 10)
-    cmds.button(l="MUDBOX > MARI (UV to UDIM)", command='MudToMari()')
-    cmds.separator (h= 10)
-    cmds.button(label="MARI > MUD (UDIM to UV)",command = 'UDIMtoUV()')
-    cmds.separator (h= 10)
-    cmds.button(label="Cancel",command = 'closeWin()')
-    cmds.separator (h= 10)
-    cmds.showWindow(ren)
+    ren = mc.window( t='Mari/Mudbox file converter V_01', mnb = False, mxb = False, wh=(500,200), sizeable = False)
+    mc.columnLayout(adj=True, cal="center")
+    mc.separator (h= 10)
+    mc.button(l="MUDBOX > MARI (UV to UDIM)", command='MudToMari()')
+    mc.separator (h= 10)
+    mc.button(label="MARI > MUD (UDIM to UV)",command = 'UDIMtoUV()')
+    mc.separator (h= 10)
+    mc.button(label="Cancel",command = 'closeWin()')
+    mc.separator (h= 10)
+    mc.showWindow(ren)
 
     
 
 def launchW():
-    if cmds.window( ren, exists = True ):
-        cmds.deleteUI(ren)
+    if mc.window( ren, exists = True ):
+        mc.deleteUI(ren)
         win()
     else:
         win()
@@ -33,7 +33,7 @@ def launchW():
 ###---------------Cancel----------------------------#####
 def closeWin():
     print 'Cancelling Cat of the Plan'
-    cmds.deleteUI(ren)
+    mc.deleteUI(ren)
     
     
 # Functions
