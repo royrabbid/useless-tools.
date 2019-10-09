@@ -65,8 +65,6 @@ def multiStacker():
     uvVab = 0
     totalUdims = []           
     for i in sel:#geo level
-    
-
         print '='*60
         print 'Processing geo:',i
         mc.select(i)
