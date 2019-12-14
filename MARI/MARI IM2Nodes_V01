@@ -1,3 +1,8 @@
+#Tested on Mari 4.2. This script will search for images selected in image manager through all geo/nodegrphs and print on the console the
+# names of the nodes using it/them. Usefull for replacing tileables or checking if not being used before deleting any image from the image
+#manager.
+#contact: r.guerechit@gmail.com
+
 ##################################################################################################
 #V_1.0               Prints wich nodes are using selected images in Image Manager.               #
 ##################################################################################################
