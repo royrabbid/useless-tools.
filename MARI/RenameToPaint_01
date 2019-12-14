@@ -1,6 +1,0 @@
-geo = mari.geo.current()
-ng = geo.nodeGraph()
-selectedNodeList = ng.selectedNodeList()
-keep = []
-for each in selectedNodeList:
-    each.setNodeName('paint')
