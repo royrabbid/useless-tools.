@@ -1,0 +1,84 @@
+###############################################################################################################
+## MARI NODE REALODER                                                                                         #
+## Tested in MARI 4.2                                                                                         #
+## The script will re import all imported selected paint nodes, and will rename it base on the file name.     #
+## Will also add a tag so if the key "i" is pressed on any paint node the path abd the name                   #
+## will be specified in the tag, for more information.                                                        #
+## WORKFLOW: select all the paint nodes to re import and run the script.                                      #
+## Contact: r.guerechit@gmail.com                                                                             #
+###############################################################################################################
+def getImportData(file):
+    path = '/'.join(file.split('/')[:-1])+'/'
+    fileName = file.split('/')[-1]
+    format = fileName.split('.')[-1]
+    nameWithoutUdim = '_'.join(fileName.split('_')[:-1])
+    udim = (fileName.split('_')[-1:][0]).split('.')[0]
+    return path,nameWithoutUdim, udim, format
+
+mode = 'all'#The script is expecting eighther 'selectedPatches' or 'all'
+selectedNodeList = mari.geo.current().nodeGraph().selectedNodeList()
+for node in selectedNodeList:
+    if not node.isPaintNode():
+        print '%s is not a paintable node' % node.nodeName()    
+    if node.isPaintNode():
+        try:
+            tileList = []#NEW
+            geoPatchList = mari.geo.current().patchList()#all the geo patches NEW
+            for geoPatch in geoPatchList:#NEW               
+                udim = geoPatch.udim()#NEW
+                tiledId = udim - 1001#NEW
+                tileList.append(tiledId)#NEW
+            #print 'geo patchList:',tileList
+            imageSet =node.imageSet()
+            nodePath = imageSet.image(tileList[0]).lastImportPath()#MOFIFIED
+            path   = getImportData(nodePath)[0]
+            name   = getImportData(nodePath)[1] 
+            format = getImportData(nodePath)[3] 
+
+        except:
+
+            print "The node %s doesn't seem to have imported texture"% str(node.name())
+        tagList = node.tagList()  
+        if len(node.tagList()) > 0:       
+            node.removeTag(node.tagList()[0], ForceRemove=False)
+            node.addTag(nodePath , ForceAdd = False)
+        if len(tagList) == 0:
+            tagList = tagList
+            node.addTag(nodePath , ForceAdd = False)#sets node's tag
+            print '='*40
+            print 'Setting tag:',tagList
+        node.setName(name) #Set node's name
+        patchList = mari.geo.current().patchList()#all the geo patches
+        selPatches = mari.geo.current().selectedPatches()#selected patches
+        #print 'Selected Patches:',len(selPatches) 
+        if mode == 'all':
+            coordList = []
+            allUdims = []
+            #print 'Selected mode:', mode,'patches'
+            for patch in patchList:
+                udim = patch.udim()
+                tileId = udim - 1001
+                coordList.append(tileId)
+                allUdims.append(udim)
+            #print 'coordinates to import',allUdims
+            imageSet.importImages(path+name+'_$UDIM'+'.'+format,imageSet.SCALE_THE_PATCH,UVIndexList=coordList, RemoveAlpha=False)
+            print 'imported:',name+'_####.'+format
+
+        if mode == 'selectedPatches':
+            coordinates = []
+            udims = []
+            #print 'Selected mode:', mode
+            if len(selPatches)> 0:                
+                for patch in selPatches:
+                    udim = patch.udim()
+                    tiledId = udim - 1001
+                    coordinates.append(tiledId)
+                    udims.append(udim)
+                    print 'Selected udims to re import:',udims
+                    imageSet.importImages(path+name+'_$UDIM'+'.'+format,imageSet.SCALE_THE_PATCH,UVIndexList=coordinates, RemoveAlpha=False)
+                print 'imported:',name,'_',udims,'.',format
+
+
+            if len(selPatches)<=0: 
+                print 'No patches selected'                                   
+
