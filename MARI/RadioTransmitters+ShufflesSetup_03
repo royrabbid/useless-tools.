@@ -1,3 +1,10 @@
+#Tested on MARI 4.2.the script will remove the layer structure (bottom transparency and merge) will pick up the channels name and rename
+#the imported paint node with it. Will also create a radio emitter node with the propper name and three shuffles r,g,b with it's corresponding
+#radio node emmiters.
+# WORKFLOW: -select all the imported images channels
+#           -run the script.
+#DISCALIMER: the script is made to work in vertical node layout hence the dots to organize the nodegraph.
+
 #JUST SELECT THE CHANNEL
 geo = mari.geo.current()
 ng = geo.nodeGraph()
