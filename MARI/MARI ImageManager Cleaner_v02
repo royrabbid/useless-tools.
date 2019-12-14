@@ -1,3 +1,6 @@
+#Tested on MARI 4.2. The script will deleted all the images in the image manager that are not being used in the nodegraph. The images used
+#in tileables as well as selected will be kept. Usefull whn image manager gets to crowdy or before archiving to reduce it's weight.
+
 print '##############################################'
 geos = mari.geo.list()
 sel = mari.images.selected()
