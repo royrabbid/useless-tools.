@@ -1,0 +1,19 @@
+import maya.cmds as mc
+import random as rand
+import pymel.core as pm
+
+color = (1,.5,.5)
+sel = mc.ls(sl=True)
+#print sel
+
+for object in sel:
+    print object    
+    shader = mc.shadingNode('surfaceShader',name= '%s_SHD'% str(object), asShader= True)
+    #SG = mc.shadingNode('shadingEngine',name= '%sSG' % str(object), asUtility=1)
+    SG= mc.sets(renderable=True,noSurfaceShader=True,empty=True, name = '%sSG' % str(object) )
+    mc.connectAttr( '%s.outColor'%shader, '%s.surfaceShader'%SG, f = True )
+    r = [rand.random() for i in range(3)]
+    mc.setAttr ( ('%s.outColor'% shader),r[0],r[1],r[2], type = 'double3' ) 
+    #mc.select (mc.listRelatives(shapes = True))
+    mc.select (object)
+    mc.hyperShade(assign = shader)
