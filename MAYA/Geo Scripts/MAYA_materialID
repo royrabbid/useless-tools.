@@ -1,0 +1,55 @@
+import maya.cmds as mc
+
+sel = mc.ls(sl = True)
+print sel
+
+
+def createShader(name):
+    color = [0,0,0]
+    if name == 'concrete':
+        color = [0.008,0.008,0.803]
+    if name == 'iron':
+        color =[0.008, 0.803, 0.008] 
+    if name == 'plaster':
+        color = [0.803, 0.008, 0.008] 
+    if name == 'wood':
+        color = [0.803, 0.803, 0.008] 
+    if name == 'glass':
+        color = [0.008, 0.803, 0.803]     
+    if name == 'rubber':
+        color = [0.292, 0.072, 0.558]      
+    if name == 'plastic':
+        color = [0.685, 0.803, 0.008]
+    if name == 'aluminium':
+        color = [0.003, 0.345, 0.202]       
+    if name == 'steel':
+        color = [0.451, 0.411, 0.597]
+    if name == 'galvanized':
+        color = [0.987, 0.000, 0.879]
+    if name == 'foam':
+        color = [1, 0.00, 0.000]
+    if name == 'paper':
+        color = [0.883, 0.760, 0.390]
+    
+    strColor = str(color)    
+    print 'color:',strColor,type(strColor)                    
+    shader = mc.shadingNode('surfaceShader',name= '%s_SHD'% str(name), asShader= True)
+    SG= mc.sets(renderable=True,noSurfaceShader=True,empty=True, name =  str(name)+ str(color)+ 'SG')
+    mc.connectAttr( '%s.outColor'%shader, '%s.surfaceShader'%SG, f = True )
+    mc.setAttr ( ('%s.outColor'% shader),color[0],color[1],color[2], type = 'double3' ) 
+    return shader
+    
+for group in sel:
+    material = group
+    print 'material:', material
+    sh = createShader(material)
+    print sh
+    mc.select(group)
+    shapes = mc.listRelatives( children = True)
+    print shapes
+    for shape in shapes:
+        print shape
+        mc.select(shape)
+        mc.hyperShade(assign = sh)        
+     
+    
