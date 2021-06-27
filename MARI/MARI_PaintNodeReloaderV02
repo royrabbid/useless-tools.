@@ -1,0 +1,105 @@
+###############################################################################################################
+## MARI NODE REALODER                                                                                         #
+## Tested in MARI 4.2                                                                                         #
+## The script will re import all imported selected paint nodes, and will rename it base on the file name.     #
+## Will also add a tag so if the key "i" is pressed on any paint node the path and the name                   #
+## will be specified in the tag, for more information.                                                        #
+## WORKFLOW: select all the paint nodes to re import and run the script.                                      #
+## Contact: r.guerechit@gmail.com                                                                             #
+###############################################################################################################
+
+
+import mari 
+def getFuncVersion():
+    version = 1.0
+    print 'Function Version {0}'.format(version)
+    return version
+
+def getImportData(file):
+    path = '/'.join(file.split('/')[:-1])+'/'
+    fileName = file.split('/')[-1]
+    format = fileName.split('.')[-1]
+    nameWithoutUdim = '_'.join(fileName.split('_')[:-1])
+    udim = (fileName.split('_')[-1:][0]).split('.')[0]
+    return path,nameWithoutUdim, udim, format
+
+def reloadPaintNode(modeArg):
+    mode = modeArg
+    print 'Selected Mode:', mode
+    selectedNodeList = mari.geo.current().nodeGraph().selectedNodeList()
+    if selectedNodeList:
+        for node in selectedNodeList:
+            if node.isPaintNode():
+                print 'Processing: ', node.nodeName()    
+                selPatches = mari.geo.current().selectedPatches()#selected patches
+                tileList = []
+                geoPatchList = mari.geo.current().patchList()#all the geo patches NEW
+                #print geoPatchList
+                if mode == 'all':
+                    for geoPatch in geoPatchList:              
+                        udim = geoPatch.udim()
+                        tiledId = tiledId = int(str(udim)) - 1001
+                        tileList.append(tiledId)
+                if mode == 'selectedPatches':
+                    for patch in selPatches:
+                        udim = patch.udim()
+                        tiledId = int(str(udim)) - 1001
+                        tileList.append(tiledId)
+                #print 'geo patchList:',tileList
+                imageSet =node.imageSet()
+                #print 'imageSet:', imageSet
+                #print 'Before testing amount of elements:',len(tileList)
+                #print 'Before Tile List',tileList
+                #print 'mode', mode
+                imported_tag_list = []
+                imported_names = []
+                print '='*100
+                for tile in tileList:
+                    print '='*30
+                    print 'udim',tile + 1001
+                    try:
+                        nodePath = imageSet.image(tile).lastImportPath()
+                        print 'nodePath', nodePath
+                    except:
+                        print "The node {0} doesn't seem to have imported textures or the file doesn't exist".format(node.name())
+                        break
+                    if len(nodePath) < 8:
+                        print tile + 1001,'is empty, ignoring'
+                        continue
+                    else:
+                        path   = getImportData(nodePath)[0]
+                        #print 'path:',path
+                        name   = getImportData(nodePath)[1] 
+                        print 'name:', name
+                        udim = int(getImportData(nodePath)[2])
+                        #print 'udim:',udim, 'type',type(udim) 
+                        format = getImportData(nodePath)[3]
+                        if name not in imported_names: # APPENDING UNIQUE NAME TO SET NODE NAME
+                            imported_names.append(name)
+                        tag_data = '{0}{1}'.format(path, name)
+                        if tag_data not in imported_tag_list:  # APPENDING UNIQUE TAG DATA TO SET NODE TAG
+                            imported_tag_list.append(tag_data)
+                        print ' Importing: {0}{1}_{2}.{3}'.format(path,name,udim,format)
+                        udim_to_import = [udim - 1001]
+                        imageSet.importImages(nodePath,imageSet.SCALE_THE_PATCH,UVIndexList=udim_to_import, RemoveAlpha=True)
+             
+
+                    print '='*100
+                    #print 'After testing amount of elements:',len(tileList)
+                    #print 'After Tile List',tileList
+                    print 
+                    unique_tags = imported_tag_list
+                    if len(node.tagList()) > 0:
+                        node.removeTag(node.tagList()[0], ForceRemove=False)
+                        node.addTag(str(unique_tags) , ForceAdd = False)#sets node's tag
+                    else:
+                        node.addTag(str(unique_tags) , ForceAdd = False)#sets node's tag
+                    non_unico_names = []
+                    for unicode in imported_names:
+                        non_uni = unicode.encode('ascii','ignore')
+                        non_unico_names.append(non_uni)
+                    node.setName(str(non_unico_names)) #Set node's name                
+            else:
+                print '%s is not a paintable node' % node.nodeName() 
+    else:
+        print 'No paint node selected'
