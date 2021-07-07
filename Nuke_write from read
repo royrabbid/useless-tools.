@@ -1,0 +1,42 @@
+sn = nuke.selectedNodes()
+agregado = 'WHATEVER YOU WANT TO ADD' # adds this string at the end of the filename
+
+def upstream(startNode=None,nodes=None):
+    if nodes is None:
+        nodes = set([])
+    node = startNode
+    if not node:
+        return
+    else:
+        upNodes = nuke.dependencies(node)
+        for n in upNodes:
+            nodes.add(n)
+            if n.Class() == "Group":
+                group = nuke.toNode(n.name())
+                with group:
+                    outputs = nuke.allNodes('Output')
+                    for o in outputs:
+                        upstream(o,nodes=nodes)
+            upstream(n,nodes=nodes)
+    return list(nodes)
+
+for wr in sn:
+    nodeList = upstream(nuke.selectedNodes())
+    for nds in nodeList:
+        global var
+        readlist = []
+        if nds.Class() == "Read":
+            print 'es Read'
+            readlist.append(nds)
+            for read in readlist:
+                print read['file'].getValue()
+                read.setSelected(True)
+                path =  [read.knobs()['file'].value()] # prints file attr from the selected node
+                for repl in path:
+                    sp=repl.split('.') # separates the data by dots present in them.
+                    form = sp.pop(-1) 
+                    jn='.'.join(sp) # merges everything
+                    finalPath = jn+'_'+agregado+'.'+form   
+                    print finalPath
+                    print wr
+                    wr['file'].setValue(finalPath)
