@@ -1,6 +1,5 @@
 # Nuke Write creator V007
 import nuke as nk
-import os
 from nukescripts import PythonPanel
 class SetWrite(nukescripts.PythonPanel):
     def __init__(self, node):
@@ -60,19 +59,13 @@ def create_write():
 
 def goScript():
     sep = str(os.sep)
-    print 'separator:',sep
     sufix = str(sw.sufixKnob.value())
     fileMode = str(sw.modeKnob.value())
     format = str(sw.formKnob.value())
     newFile =   str(sw.fileKnob.value())
     newPath = str(sw.pathKnob.value())
-    if  newPath.endswith('/') or newPath.endswith(sep):
-        fNewPath = newPath
-    else:
-        fNewPath = newPath + sep
-    print 'inputFile:',fNewPath
-    #sNewPath = newPath.split('\'')
-    #fNewPath = str('/'.join(sNewPath))
+    fNewPath = newPath.replace(sep, '/' )
+    print 'joined path',fNewPath
     addColor = str(sw.csKnob.value())
     print  'addColor:' ,addColor
     addDot = str(sw.dotKnob.value())
@@ -145,12 +138,6 @@ def goScript():
             path = replace.split('/')
             path.pop(-1)
             path = '/'.join(path) # PATH'S VARIABLE NAME
-            print 'Read path:', path
-            print 'format:', firstReadFormat
-            print 'File Name:',file
-            split = path.split('/')
-            path = sep.join(split)
-            print 'Final Path:',path
             # CREATES THE EXTRA NODES AND SETS THEM ACORDINGLY
             nuke.selectAll()
             nuke.invertSelection()# DESELECTS
@@ -236,37 +223,37 @@ def goScript():
         # SETS THE WRITE NODE
         if fileMode == ('Same as Read'):
             if secuence == ('off'):
-                finalPath = path+ sep + file + '.' + format
+                finalPath = path+ '/' + file + '.' + format
             if secuence == ('on') and partSec == ('False'):
-                finalPath = path+ sep + file + '_' + "####" + '.' + format
+                finalPath = path+ '/' + file + '_' + "####" + '.' + format
                 start = start + increment 
             if secuence == ('on') and partSec == ('True'):
-                finalPath = path+ sep + file + '_' + str(start) + '.' + format
+                finalPath = path+ '/' + file + '_' + str(start) + '.' + format
                 start = start + 1
  
         if fileMode == ('Same as Read + sufix'):
             if secuence == ('off'):
-                finalPath = path + sep + file + '_' + sufix +  '.' + format 
+                finalPath = path + '/' + file + '_' + sufix +  '.' + format 
             if secuence == ('on') and partSec == ('True'):
-                finalPath = path + sep + file + '_' + sufix + '_' + str(start) +  '.' + format
+                finalPath = path + '/' + file + '_' + sufix + '_' + str(start) +  '.' + format
                 start = start + 1  
             if secuence == ('on') and partSec == ('False'):
-                finalPath = path + sep + file + '_' + sufix + '_' + str('####') +  '.' + format
+                finalPath = path + '/' + file + '_' + sufix + '_' + str('####') +  '.' + format
                 start = start + increment
 
         if fileMode == ('New File Name '):
             if secuence == ('off'):
-                finalPath = path + sep + newFile + '_' + str(num) + '.' + format
+                finalPath = path + '/' + newFile + '_' + str(num) + '.' + format
                 num += 1
             if secuence == ('on') and partSec == ('False'):
-                finalPath = path + sep + newFile + '_' + str(num) + '_' + '####' + '.' + format
+                finalPath = path + '/' + newFile + '_' + str(num) + '_' + '####' + '.' + format
             if secuence == ('on') and partSec == ('True'):
-                finalPath = path + sep + newFile + '_' + str(start) + '.' + format
+                finalPath = path + '/' + newFile + '_' + str(start) + '.' + format
                 start = start + 1
 
         if fileMode == ('New Path'):
             if secuence == ('off'):
-                finalPath = fNewPath  + file + '.' + format
+                finalPath = fNewPath + '/' + file + '.' + format
             if secuence == ('on') and partSec == ('True'):
                 finalPath = fNewPath + file + '_' + str(start) + '.' + format
                 start = start + 1
@@ -275,12 +262,12 @@ def goScript():
                 
         if fileMode == ('Path and FileName'):
             if secuence == ('off'):
-                finalPath = fNewPath + newFile + '_' + str(num) + '.' + format 
+                finalPath = newPath + newFile + '_' + str(num) + '.' + format 
                 num += 1
             if secuence == ('on') and partSec == ('False'):
-                finalPath = fNewPath  + newFile + '_' + '####' + '.' + format 
+                finalPath = newPath  + newFile + '_' + '####' + '.' + format 
             if secuence == ('on') and partSec == ('True'):
-                finalPath = fNewPath + newFile + '_' + str(start) + '.' + format 
+                finalPath = newPath + newFile + '_' + str(start) + '.' + format 
                 start = start + 1
 
         wr['file'].setValue(finalPath)
