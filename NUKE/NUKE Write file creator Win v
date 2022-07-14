@@ -1,0 +1,316 @@
+# Nuke Write creator V004
+import nuke as nk
+#from nuke_weta_base.node.write.weta_write.api import WetaWrite
+
+class SetWrite(nukescripts.PythonPanel):
+    def __init__(self, node):
+                nukescripts.PythonPanel.__init__(self, 'Write Set Up')
+                self.rpNode = node
+                #Creates Knobs
+                self.modeKnob = nuke.Enumeration_Knob('Mode', 'Select Mode ', ['Same as Read' ,'Same as Read + sufix', 'Search & Replace Path','New Path', 'New File Name ', 'Path and FileName'])                                           
+                self.formKnob = nuke.Enumeration_Knob('Form', 'Format ', ['exr', 'png', 'tif', 'jpg', 'tga', 'Hdr', 'tx'])
+                self.csKnob = nuke.Boolean_Knob('addCS', 'Add ColorSpace ')
+                self.dotKnob = nuke.Boolean_Knob('addDot', 'Add Dot', 'False' ) 
+                self.cropKnob = nuke.Boolean_Knob('addCrop','Add Crop', 'False')                              
+                self.pathKnob = nuke.String_Knob('newPathame', 'New Path')
+                self.pathKnob.setVisible(False)               
+                self.fileKnob = nuke.String_Knob('newFile', 'New File') 
+                self.fileKnob.setVisible(False) 
+                self.sufixKnob = nuke.String_Knob('PrefixU', 'Sufix')
+                self.sufixKnob.setVisible(False)
+                self.alphaKnob = nuke.Boolean_Knob('alpha', 'Alpha',)
+                self.secKnob = nuke.Enumeration_Knob('sec', 'Sequence (hashes)' , ['off', 'on'])
+                self.partSecKnob = nuke.Boolean_Knob('partSec', 'Part of a Sequence ( Start / Increment)',)
+                self.startKnob = nuke.Int_Knob('start', 'Start', 1001) 
+                self.incKnob = nuke.Int_Knob('inc', 'Increment', 10)
+                self.dividerKnob01 = nuke.Text_Knob('E.Ns')
+                self.dividerKnob02 = nuke.Text_Knob('Sec')
+                self.searchKnob = nuke.String_Knob('search', 'Search') 
+                self.searchKnob.setVisible(False)         
+                self.replaceKnob = nuke.String_Knob('replace', 'Replace') 
+                self.replaceKnob.setVisible(False)          
+                #Adds Knobs
+                for k in ( self.modeKnob, self.formKnob, self.pathKnob, self.fileKnob, self.sufixKnob,self.incKnob,self.searchKnob, self.replaceKnob, self.dividerKnob01,self.dotKnob, self.csKnob, self.cropKnob, self.alphaKnob, self.dividerKnob02 ,self.secKnob, self.partSecKnob,self.startKnob):         
+                #for k in ( self.modeKnob, self.formKnob, self.pathKnob, self.fileKnob, self.sufixKnob, self.dividerKnob01,self.dotKnob, self.csKnob, self.cropKnob, self.alphaKnob):
+                        self.addKnob(k)
+
+    def knobChanged( self, modeKnob):
+        print("mode selection", modeKnob)
+        if modeKnob is self.modeKnob:
+            shouldShowP = self.modeKnob.value() not in ('New fileName', 'Same as Read', 'Same as Read + sufix', 'New File Name ','Search & Replace Path')
+            self.pathKnob.setVisible(shouldShowP)
+        if modeKnob is self.modeKnob:
+            shouldShowF = self.modeKnob.value() not in ('New Path', 'Same as Read', 'Same as Read + sufix','Search & Replace Path')
+            self.fileKnob.setVisible(shouldShowF)
+        if modeKnob is self.modeKnob:
+            shouldShowPr = self.modeKnob.value() not in ('New Path', 'Same as Read', 'New File Name ', 'Path and FileName','Search & Replace Path')
+            self.sufixKnob.setVisible(shouldShowPr)
+        if modeKnob is self.modeKnob:
+            shouldShowFs = self.modeKnob.value() not in ('New Path', 'Same as Read', 'New File Name ', 'Path and FileName', 'New Path','New File Name ', 'Path and FileName')
+            self.searchKnob.setVisible(shouldShowFs)
+            self.replaceKnob.setVisible(shouldShowFs)
+
+    def secChanged( self, secKnob):
+        print("mode selection", secKnob)
+        if secKnob is self.secKnob:
+            showInc = self.secKnob.value() not in ('off')
+            self.incKnob.setVisible(showInc)
+
+def create_write():
+    global sw
+    sw = SetWrite(())
+    Accepted = sw.showModalDialog()
+    if Accepted:
+        goScript()
+    else:
+        print('Canceled')
+
+def goScript():
+    search = str(sw.searchKnob.value())
+    replaceVar = str(sw.replaceKnob.value())
+    print('search:',search)
+    print('replace:',replaceVar)
+    sufix = str(sw.sufixKnob.value())
+    fileMode = str(sw.modeKnob.value())
+    format = str(sw.formKnob.value())
+    newFile =   str(sw.fileKnob.value()) 
+    newPath = str(sw.pathKnob.value())
+    if '\\' in newPath:        
+        newPath = newPath.replace('\\', '/')
+        print ('Replaced back slashes ')
+    sNewPath = newPath.split('\'')
+    fNewPath = str('/'.join(sNewPath))
+    addColor = str(sw.csKnob.value())
+    print(addColor, 'addColor result')
+    addDot = str(sw.dotKnob.value())
+    print(addDot, 'add dot result')
+    addCrop = str(sw.cropKnob.value())
+    print(addCrop,'addCrop result')
+    num = 1001
+    sn = nk.selectedNodes()
+    sn = sn[::-1]
+    alpha = str(sw.alphaKnob.value())
+    print(alpha, 'alpha result')
+    secuence = str(sw.secKnob.value())
+    start = sw.startKnob.value()
+    increment = sw.incKnob.value()
+    partSec = str(sw.partSecKnob.value())
+    #print 'sorted selectedNodes',sn
+    count = 1001
+    
+    def upstream(startNode=None,nodes=None):
+            if nodes is None:
+                nodes = set([])
+            node = startNode
+            if not node:
+                return
+            else:
+                upNodes = nk.dependencies(node)
+                for n in upNodes:
+                    nodes.add(n)
+                    if n.Class() == "Group":
+                        group = nuke.toNode(n.name())
+                        with group:
+                            outputs = nuke.allNodes('Output')
+                            for o in outputs:
+                                upstream(o,nodes=nodes)
+                    upstream(n,nodes=nodes)
+            return list(nodes)
+    ### GET THE FIRST READ AND GETS ITS DATA
+    for i in sn:
+        #GETS THE FIRST READ'S FILE KNOB AND STORE THAT DATA
+        nuke.selectAll()
+        nuke.invertSelection()    
+        i.setSelected(True) 
+        nodesInSelection = upstream(i)
+        readlist = []
+        for node in nodesInSelection:
+            if node.Class() == "Read":
+                readlist.append(node)
+        readNames = []
+    ##### GETS THE NAMES OF THE READS
+        for s in readlist:
+            n = s['name'].value()
+            readNames.append(n)
+        if len(readNames) > 0: # IF THERE'S ONLY ONE READ GET THE MIN
+            firstRead = min(readNames)
+        else:
+            firstRead = i['name'].value() # GET THE ONLY ONE READ AVAILABLE
+        nuke.selectAll()
+        nuke.invertSelection()# DESELECTS 
+        nuke.toNode(str(firstRead)).setSelected(True)
+        fReadSel = nk.selectedNode()  
+        firstReadfileKnob = [fReadSel.knobs()['file'].value()]
+
+        for replace in firstReadfileKnob:
+            firstReadFormat = (replace.split('.')).pop(-1) # FORMAT'S VARIABLE NAME
+            fileEntero = (replace.split('/')).pop(-1)
+            fileEntero = fileEntero.split('.')
+            fileEntero.pop(-1)
+            fileEntero = '.'.join(fileEntero)
+            file = fileEntero
+            print('Name:',file)
+            splitName = file.split('_')
+            #print 'splitName:',splitName, 'splitName [-1]:',splitName[-1], type(splitName[-1])
+            try:
+                if  splitName[-1].startswith('%'): 
+                    print('Sequence found',(splitName[-1]))
+                    udimFile = 'True'
+                else:
+                    int(splitName[-1])
+                    udimFile = 'False'
+                    print('Integer found',(splitName[-1]))
+            except:
+                print('The read is not a sequence and does not have udim number')
+                udimFile = 'False'
+            #print 'udimFile:',udimFile
+            #print splitName[:-1]
+            udimName = ('_').join(splitName[:-1])
+            #print 'newName',udimName
+            path = replace.split('/')
+            path.pop(-1)
+            path = '/'.join(path) # PATH'S VARIABLE NAME
+            #print 'path:',path+'/'
+            replacedPath = str(path+ '/').replace(str(search), str(replaceVar))
+            print('replacedPath:',replacedPath)
+            # CREATES THE EXTRA NODES AND SETS THEM ACORDINGLY
+            nuke.selectAll()
+            nuke.invertSelection()# DESELECTS
+            i.setSelected(True) 
+        # CREATES THE NODES AND SETS THEM UP
+        if addDot == ('True'):
+            nuke.createNode("Dot",inpanel=False )
+        if addColor == ('True'):
+            nuke.createNode("OCIOColorSpace",inpanel=False )
+            nuke.selectedNode().knob('in_colorspace').setValue('project')
+        if addCrop == ('True'):
+            nuke.createNode("Crop",inpanel=False )
+            nuke.selectedNode().knob('reformat').setValue('true' )
+        nuke.createNode("Write",inpanel=False )
+        #write_tab = WetaWrite(nuke.selectedNode())
+        #write_tab.enable_weta_tab = False
+        nuke.selectedNode().knob('create_directories').setValue('true')
+        #Creates the write nodes
+        if format == ('exr'):
+            if alpha == ('False'):
+                nuke.selectedNode().knob('channels').setValue('rgb')
+            if alpha == ('True'):
+                nuke.selectedNode().knob('channels').setValue('rgba')
+            nuke.selectedNode().knob('file_type').setValue('exr')
+            nuke.selectedNode().knob('autocrop').setValue('false')
+            nuke.selectedNode().knob('metadata').setValue('no metadata')
+            nuke.selectedNode().knob('datatype').setValue('16 bit half')
+            nuke.selectedNode().knob('compression').setValue('4')
+            #nuke.selectedNode().knob('create_directories').setValue(True)
+        if format == ('png'):
+            if alpha == ('False'):
+                nuke.selectedNode().knob('channels').setValue('rgb')
+            if alpha == ('True'):
+                nuke.selectedNode().knob('channels').setValue('rgba')
+            nuke.selectedNode().knob('file_type').setValue('png')
+            #nuke.selectedNode().knob('datatype').setValue('16 bit')
+            #nuke.selectedNode().knob('create_directories').setValue(True)[Desktop Entry]
+
+
+        if format == ('jpg'):
+            nuke.selectedNode().knob('channels').setValue('rgb')
+            nuke.selectedNode().knob('file_type').setValue('jpeg')
+            #nuke.selectedNode().knob('_jpeg_quality').setValue('1')
+            #nuke.selectedNode().knob('create_directories').setValue(True)
+        if format == ('tga'):
+            if alpha == ('False'):
+                nuke.selectedNode().knob('channels').setValue('rgb')
+            if alpha == ('True'):
+                nuke.selectedNode().knob('channels').setValue('rgba')
+            nuke.selectedNode().knob('file_type').setValue('targa')
+            #nuke.selectedNode().knob('compression').setValue('RLE')
+            #nuke.selectedNode().knob('create_directories').setValue(True)
+        if format == ('tif'):
+            if alpha == ('False'):
+                nuke.selectedNode().knob('channels').setValue('rgb')
+            if alpha == ('True'):
+                nuke.selectedNode().knob('channels').setValue('rgba')
+            nuke.selectedNode().knob('file_type').setValue('tiff')
+            nuke.selectedNode().knob('datatype').setValue('16 bit')
+            #nuke.selectedNode().knob('compression').setValue('LZW')
+            #nuke.selectedNode().knob('create_directories').setValue(True)
+        if format == ('tx'):
+            nuke.selectedNode().knob('channels').setValue('rgb')
+            nuke.selectedNode().knob('file_type').setValue('tx')
+            nuke.selectedNode().knob('metadata').setValue('no metadata')
+            nuke.selectedNode().knob('create_directories').setValue(True)
+        if format == ('hdr'):
+            if alpha == ('False'):
+                nuke.selectedNode().knob('channels').setValue('rgb')
+            if alpha == ('True'):
+                nuke.selectedNode().knob('channels').setValue('rgba')
+            nuke.selectedNode().knob('file_type').setValue('hdr')
+            nuke.selectedNode().knob('datatype').setValue('16 BIT HALF')
+            nuke.selectedNode().knob('compression').setValue('RLE')
+            nuke.selectedNode().knob('create_directories').setValue(True)
+        wr = nk.selectedNode()
+#        print wr
+        # SETS THE WRITE NODE
+        if fileMode == ('Same as Read'):
+            if secuence == ('off'):
+                finalPath = path+ '/' + file + '.' + format
+            if secuence == ('on') and partSec == ('False'):
+                finalPath = path+ '/' + file + '_' + "####" + '.' + format
+                start = start + increment 
+            if secuence == ('on') and partSec == ('True'):
+                finalPath = path+ '/' + file + '_' + str(start) + '.' + format
+                start = start + increment
+ 
+        if fileMode == ('Same as Read + sufix'):
+            if secuence == ('off'):
+                if udimFile == 'False':
+                    finalPath = path + '/' + file + '_' + sufix +  '.' + format 
+                if udimFile == 'True':
+                    finalPath = path + '/' + udimName + '_' + sufix + '_'+ str('####') + '.' + format 
+                    print('finalPath   :',finalPath)
+            if secuence == ('on') and partSec == ('True'):
+                finalPath = path + '/' + file + '_' + sufix + '_' + str(start) +  '.' + format
+                start = start + increment  
+            if secuence == ('on') and partSec == ('False'):
+                finalPath = path + '/' + file + '_' + sufix + '_' + str('####') +  '.' + format
+                start = start + increment
+
+        if fileMode == ('New File Name '):
+            if secuence == ('off'):
+                finalPath = path + '/' + newFile+ '_'+ str(count) + '_' + str(num) + '.' + format
+                num += increment
+            if secuence == ('on') and partSec == ('False'):
+                finalPath = path + '/' + newFile + '_' + '_' + '####' + '.' + format
+            if secuence == ('on') and partSec == ('True'):
+                finalPath = path + '/' + newFile + '_' + str(start) + '.' + format
+                start = start + increment
+
+        if fileMode == ('New Path'):
+            if secuence == ('off'):
+                finalPath = fNewPath  + file + '.' + format
+            if secuence == ('on') and partSec == ('True'):
+                finalPath = fNewPath + file + '_' + str(start) + '.' + format
+                start = start + increment
+            if secuence == ('on') and partSec == ('False'):
+                finalPath = fNewPath + file + '_' + '####' + '.' + format
+                
+
+        if fileMode == ('Path and FileName'):
+            if secuence == ('off'):
+                finalPath = newPath +'/'+ newFile + '_'+ str(count)  + '.' + format 
+                num += increment
+            if secuence == ('on') and partSec == ('False'):
+                finalPath = newPath  +'/'+ newFile + '_' + '####' + '.' + format 
+            if secuence == ('on') and partSec == ('True'):
+                finalPath = newPath +'/'+ newFile + '_' + str(start) + '.' + format 
+                start = start + increment
+
+        if fileMode == ('Search & Replace Path'):
+            finalPath = replacedPath +'/'+ file  + '.' + format 
+
+        wr['file'].setValue(finalPath)
+        count = count + 1
+
+create_write()
+
+
